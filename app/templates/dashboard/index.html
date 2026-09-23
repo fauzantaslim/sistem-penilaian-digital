@@ -1,0 +1,164 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="page-header flex-between">
+  <div>
+    <h1>Dashboard</h1>
+    <div class="breadcrumb">Selamat datang, <strong>{{ current_user.username }}</strong> 👋</div>
+  </div>
+</div>
+
+<!-- Stat Cards -->
+<div class="stat-grid">
+  <div class="stat-card purple">
+    <div class="stat-icon"><i class="fa-solid fa-users"></i></div>
+    <div class="stat-info">
+      <div class="stat-value">{{ total_siswa }}</div>
+      <div class="stat-label">Total Siswa</div>
+    </div>
+  </div>
+  <div class="stat-card cyan">
+    <div class="stat-icon"><i class="fa-solid fa-book-open"></i></div>
+    <div class="stat-info">
+      <div class="stat-value">{{ total_mapel }}</div>
+      <div class="stat-label">Mata Pelajaran</div>
+    </div>
+  </div>
+  <div class="stat-card green">
+    <div class="stat-icon"><i class="fa-solid fa-file-circle-check"></i></div>
+    <div class="stat-info">
+      <div class="stat-value">{{ total_proses }}</div>
+      <div class="stat-label">Lembar Dinilai</div>
+    </div>
+  </div>
+  <div class="stat-card orange">
+    <div class="stat-icon"><i class="fa-solid fa-star"></i></div>
+    <div class="stat-info">
+      <div class="stat-value">{{ rata_skor }}</div>
+      <div class="stat-label">Rata-rata Skor</div>
+    </div>
+  </div>
+</div>
+
+<!-- Chart + Quick Actions -->
+<div class="dashboard-grid">
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">
+        <i class="fa-solid fa-chart-bar text-purple"></i> Aktivitas Penilaian
+      </span>
+      <span class="badge badge-purple">7 Hari Terakhir</span>
+    </div>
+    <div style="padding:16px;">
+      <canvas id="activity-chart" height="180"
+        data-labels='["Sen","Sel","Rab","Kam","Jum","Sab","Min"]'
+        data-values='[0,0,0,0,0,0,0]'>
+      </canvas>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">
+        <i class="fa-solid fa-bolt text-cyan"></i> Aksi Cepat
+      </span>
+    </div>
+    <div class="card-body" style="display:flex;flex-direction:column;gap:10px;">
+      <a href="{{ url_for('upload.index') }}" class="btn btn-primary btn-block">
+        <i class="fa-solid fa-cloud-arrow-up"></i> Upload Lembar Jawaban
+      </a>
+      <a href="{{ url_for('siswa.tambah') }}" class="btn btn-outline btn-block">
+        <i class="fa-solid fa-user-plus"></i> Tambah Siswa Baru
+      </a>
+      <a href="{{ url_for('mapel.tambah') }}" class="btn btn-outline btn-block">
+        <i class="fa-solid fa-plus"></i> Tambah Mata Pelajaran
+      </a>
+      <a href="{{ url_for('laporan.index') }}" class="btn btn-outline btn-block">
+        <i class="fa-solid fa-chart-bar"></i> Lihat Laporan
+      </a>
+      <div class="divider"></div>
+      <div class="flex-between">
+        <span class="text-sm text-muted">Menunggu diproses</span>
+        <span class="badge badge-orange">{{ total_pending }} lembar</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Recent Assessments -->
+<div class="card">
+  <div class="card-header">
+    <span class="card-title">
+      <i class="fa-solid fa-clock-rotate-left text-purple"></i> Penilaian Terbaru
+    </span>
+    <a href="{{ url_for('laporan.index') }}" class="btn btn-outline btn-sm">Lihat Semua</a>
+  </div>
+
+  {% if penilaian_terbaru %}
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Siswa</th>
+          <th>Kelas</th>
+          <th>Mata Pelajaran</th>
+          <th>Skor</th>
+          <th>Tanggal</th>
+          <th>Aksi</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for hasil in penilaian_terbaru %}
+        <tr>
+          <td class="text-muted">{{ loop.index }}</td>
+          <td class="fw-bold">{{ hasil.lembar_jawaban.siswa.nama }}</td>
+          <td><span class="badge badge-purple">{{ hasil.lembar_jawaban.siswa.kelas }}</span></td>
+          <td>{{ hasil.lembar_jawaban.mata_pelajaran.nama }}</td>
+          <td>
+            {% if hasil.skor is not none %}
+              <span class="fw-bold {% if hasil.skor >= 75 %}text-green{% elif hasil.skor >= 50 %}text-orange{% else %}text-red{% endif %}">
+                {{ hasil.skor }}
+              </span>
+            {% else %}
+              <span class="text-muted">—</span>
+            {% endif %}
+          </td>
+          <td class="text-muted text-sm">{{ hasil.created_at.strftime('%d %b %Y') }}</td>
+          <td>
+            <a href="{{ url_for('laporan.detail', id=hasil.id) }}" class="btn btn-outline btn-sm">
+              <i class="fa-solid fa-eye"></i>
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <div class="empty-icon">📊</div>
+    <h3>Belum Ada Penilaian</h3>
+    <p>Upload lembar jawaban siswa untuk memulai penilaian.</p>
+    <a href="{{ url_for('upload.index') }}" class="btn btn-primary mt-3">
+      <i class="fa-solid fa-cloud-arrow-up"></i> Upload Sekarang
+    </a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<style>
+  .dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+    align-items: start;
+  }
+  @media (max-width: 900px) { .dashboard-grid { grid-template-columns: 1fr; } }
+</style>
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block title %}Edit Mata Pelajaran{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1>Edit Mata Pelajaran</h1>
+  <div class="breadcrumb"><a href="{{ url_for('mapel.index') }}" class="text-muted">Mata Pelajaran</a> › <span>Edit — {{ mapel.nama }}</span></div>
+</div>
+<div class="card" style="max-width:560px;">
+  <div class="card-header">
+    <span class="card-title"><i class="fa-solid fa-pen-to-square text-cyan" style="margin-right:8px;"></i>Edit Mata Pelajaran</span>
+    <span class="badge badge-gray">ID #{{ mapel.id }}</span>
+  </div>
+  <form method="POST" action="{{ url_for('mapel.edit', id=mapel.id) }}" novalidate id="form-edit-mapel">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+    <div class="form-group">
+      <label class="form-label" for="nama">Nama Mata Pelajaran</label>
+      <input type="text" id="nama" name="nama" class="form-control" value="{{ mapel.nama }}" required/>
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="kode">Kode</label>
+      <input type="text" id="kode" name="kode" class="form-control" value="{{ mapel.kode }}" required maxlength="20"/>
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="deskripsi">Deskripsi <span class="text-muted">(opsional)</span></label>
+      <textarea id="deskripsi" name="deskripsi" class="form-control">{{ mapel.deskripsi or '' }}</textarea>
+    </div>
+    <div class="flex gap-3 mt-2">
+      <button type="submit" class="btn btn-primary" id="btn-update-mapel">
+        <i class="fa-solid fa-floppy-disk"></i> Perbarui
+      </button>
+      <a href="{{ url_for('mapel.index') }}" class="btn btn-outline"><i class="fa-solid fa-arrow-left"></i> Batal</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+{% block title %}Kelola Mata Pelajaran{% endblock %}
+
+{% block content %}
+<div class="page-header flex-between">
+  <div>
+    <h1>Mata Pelajaran</h1>
+    <div class="breadcrumb">Kelola Data › <span>Mata Pelajaran</span></div>
+  </div>
+  <a href="{{ url_for('mapel.tambah') }}" class="btn btn-primary" id="btn-tambah-mapel">
+    <i class="fa-solid fa-plus"></i> Tambah Mapel
+  </a>
+</div>
+
+<div class="card mb-3">
+  <form method="GET" action="{{ url_for('mapel.index') }}" class="flex-between gap-3">
+    <div class="search-bar" style="flex:1;">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input type="text" name="q" value="{{ search }}" placeholder="Cari nama atau kode mata pelajaran..." id="search-mapel"/>
+    </div>
+    <button type="submit" class="btn btn-outline">Cari</button>
+    {% if search %}<a href="{{ url_for('mapel.index') }}" class="btn btn-outline">Reset</a>{% endif %}
+  </form>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <span class="card-title">
+      <i class="fa-solid fa-book-open text-cyan" style="margin-right:8px;"></i>
+      Daftar Mata Pelajaran
+      <span class="badge badge-cyan" style="margin-left:8px;">{{ mapel_list.total }}</span>
+    </span>
+  </div>
+
+  {% if mapel_list.items %}
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Kode</th>
+          <th>Nama Mata Pelajaran</th>
+          <th>Deskripsi</th>
+          <th>Aksi</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for mapel in mapel_list.items %}
+        <tr>
+          <td class="text-muted">{{ loop.index + (mapel_list.page - 1) * mapel_list.per_page }}</td>
+          <td><span class="badge badge-cyan">{{ mapel.kode }}</span></td>
+          <td class="fw-bold">{{ mapel.nama }}</td>
+          <td class="text-muted text-sm">{{ mapel.deskripsi or '—' }}</td>
+          <td>
+            <div class="td-actions">
+              <a href="{{ url_for('kunci.index', mapel_id=mapel.id) }}" class="btn btn-outline btn-sm" title="Lihat Kunci Jawaban">
+                <i class="fa-solid fa-key"></i>
+              </a>
+              <a href="{{ url_for('mapel.edit', id=mapel.id) }}" class="btn btn-outline btn-sm" id="btn-edit-mapel-{{ mapel.id }}">
+                <i class="fa-solid fa-pen-to-square"></i>
+              </a>
+              <button type="button" class="btn btn-danger btn-sm"
+                data-delete-url="{{ url_for('mapel.hapus', id=mapel.id) }}"
+                data-delete-name="{{ mapel.nama }}"
+                id="btn-hapus-mapel-{{ mapel.id }}">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% if mapel_list.pages > 1 %}
+  <div class="pagination">
+    {% for p in mapel_list.iter_pages() %}
+      {% if p %}
+        <a href="{{ url_for('mapel.index', page=p, q=search) }}"
+           class="page-btn {% if p == mapel_list.page %}active{% endif %}">{{ p }}</a>
+      {% else %}
+        <span class="page-btn" style="pointer-events:none;">…</span>
+      {% endif %}
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% else %}
+  <div class="empty-state">
+    <div class="empty-icon">📚</div>
+    <h3>{% if search %}Tidak ditemukan{% else %}Belum Ada Mata Pelajaran{% endif %}</h3>
+    <p>{% if search %}Coba kata kunci lain.{% else %}Tambahkan mata pelajaran untuk memulai.{% endif %}</p>
+    {% if not search %}
+    <a href="{{ url_for('mapel.tambah') }}" class="btn btn-primary mt-2">
+      <i class="fa-solid fa-plus"></i> Tambah Sekarang
+    </a>
+    {% endif %}
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

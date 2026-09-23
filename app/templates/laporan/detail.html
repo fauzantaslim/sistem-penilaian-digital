@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+{% block title %}Detail Penilaian{% endblock %}
+
+{% block content %}
+{% set lembar = hasil.lembar_jawaban %}
+{% set siswa  = lembar.siswa %}
+{% set mapel  = lembar.mata_pelajaran %}
+
+<div class="page-header flex-between">
+  <div>
+    <h1>Detail Penilaian</h1>
+    <div class="breadcrumb">
+      <a href="{{ url_for('laporan.index') }}" class="text-muted">Laporan</a> ›
+      <span>{{ siswa.nama }}</span>
+    </div>
+  </div>
+  <a href="{{ url_for('laporan.index') }}" class="btn btn-outline">
+    <i class="fa-solid fa-arrow-left"></i> Kembali
+  </a>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 2fr;gap:20px;align-items:start;" class="detail-grid">
+
+  <!-- Info Card -->
+  <div>
+    <div class="card mb-3">
+      <div class="card-header">
+        <span class="card-title"><i class="fa-solid fa-user text-purple" style="margin-right:8px;"></i>Info Siswa</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div>
+          <div class="text-sm text-muted mb-2">Nama</div>
+          <div class="fw-bold">{{ siswa.nama }}</div>
+        </div>
+        <div>
+          <div class="text-sm text-muted mb-2">NIS</div>
+          <code style="color:var(--accent-cyan);">{{ siswa.nis }}</code>
+        </div>
+        <div>
+          <div class="text-sm text-muted mb-2">Kelas</div>
+          <span class="badge badge-purple">{{ siswa.kelas }}</span>
+        </div>
+        <div>
+          <div class="text-sm text-muted mb-2">Mata Pelajaran</div>
+          <div class="fw-bold">{{ mapel.nama }}</div>
+          <span class="badge badge-cyan" style="margin-top:4px;">{{ mapel.kode }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title"><i class="fa-solid fa-star text-orange" style="margin-right:8px;"></i>Hasil</span>
+      </div>
+      <div class="text-center" style="padding:16px 0;">
+        <div style="font-size:52px;font-weight:800;line-height:1;
+          color:{% if hasil.skor and hasil.skor >= 75 %}var(--accent-green){% elif hasil.skor and hasil.skor >= 50 %}var(--accent-orange){% else %}var(--accent-red){% endif %};">
+          {{ hasil.skor if hasil.skor is not none else '—' }}
+        </div>
+        <div class="text-muted text-sm mt-2">Skor Akhir</div>
+        <div class="divider"></div>
+        <span class="badge status-{{ lembar.status }} mt-2" style="font-size:12px;padding:5px 14px;">
+          {{ lembar.status|title }}
+        </span>
+        <div class="text-muted text-sm mt-2">{{ hasil.created_at.strftime('%d %B %Y, %H:%M') }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Answer Detail -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title"><i class="fa-solid fa-list-check text-cyan" style="margin-right:8px;"></i>Detail Jawaban</span>
+      {% if detail %}
+      <span class="badge badge-gray">{{ detail|length }} soal</span>
+      {% endif %}
+    </div>
+
+    {% if detail %}
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:10px;">
+      {% for nomor, jawaban in detail.items() %}
+      <div style="background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px;text-align:center;">
+        <div class="text-muted text-sm">No. {{ nomor }}</div>
+        <div style="font-size:20px;font-weight:800;margin-top:4px;
+          color:var(--accent-green);">
+          {{ jawaban }}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+      <div class="empty-icon">📝</div>
+      <h3>Detail Belum Tersedia</h3>
+      <p>Lembar jawaban belum selesai diproses atau tidak ada detail jawaban.</p>
+    </div>
+    {% endif %}
+
+    <!-- File preview -->
+    <div class="divider"></div>
+    <div>
+      <div class="text-sm text-muted mb-2 fw-bold">File Lembar Jawaban</div>
+      <div style="font-size:12px;color:var(--accent-cyan);">{{ lembar.filename }}</div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<style>
+  @media (max-width: 900px) {
+    .detail-grid { grid-template-columns: 1fr !important; }
+  }
+</style>
+{% endblock %}

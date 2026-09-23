@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+{% block title %}Kunci Jawaban{% endblock %}
+
+{% block content %}
+<div class="page-header flex-between">
+  <div>
+    <h1>Kunci Jawaban</h1>
+    <div class="breadcrumb">Kelola Data › <span>Kunci Jawaban</span></div>
+  </div>
+  <a href="{{ url_for('kunci.tambah') }}" class="btn btn-primary" id="btn-tambah-kunci">
+    <i class="fa-solid fa-plus"></i> Tambah Kunci
+  </a>
+</div>
+
+<!-- Filter mapel -->
+<div class="card mb-3">
+  <form method="GET" action="{{ url_for('kunci.index') }}" class="flex gap-3 align-items-center" id="filter-kunci-form">
+    <div class="form-group mb-0" style="flex:1;">
+      <label class="form-label" for="mapel-filter">Filter Mata Pelajaran</label>
+      <select name="mapel_id" id="mapel-filter" class="form-select">
+        <option value="">— Pilih Mata Pelajaran —</option>
+        {% for m in mapel_list %}
+        <option value="{{ m.id }}" {% if selected_mapel == m.id %}selected{% endif %}>
+          [{{ m.kode }}] {{ m.nama }}
+        </option>
+        {% endfor %}
+      </select>
+    </div>
+    <div style="padding-top:22px;">
+      <button type="submit" class="btn btn-outline">Tampilkan</button>
+    </div>
+  </form>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <span class="card-title">
+      <i class="fa-solid fa-key text-orange" style="margin-right:8px;"></i>
+      Daftar Kunci Jawaban
+      {% if kunci_list %}
+      <span class="badge badge-orange" style="margin-left:8px;">{{ kunci_list|length }} soal</span>
+      {% endif %}
+    </span>
+  </div>
+
+  {% if not selected_mapel %}
+  <div class="empty-state">
+    <div class="empty-icon">🔑</div>
+    <h3>Pilih Mata Pelajaran</h3>
+    <p>Pilih mata pelajaran di atas untuk melihat kunci jawabannya.</p>
+  </div>
+
+  {% elif kunci_list %}
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>No. Soal</th>
+          <th>Jawaban Benar</th>
+          <th>Dibuat</th>
+          <th>Aksi</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for k in kunci_list %}
+        <tr>
+          <td class="fw-bold text-purple">Soal {{ k.nomor_soal }}</td>
+          <td>
+            <span class="badge badge-green" style="font-size:14px;padding:5px 14px;">
+              {{ k.jawaban_benar }}
+            </span>
+          </td>
+          <td class="text-muted text-sm">{{ k.created_at.strftime('%d %b %Y') }}</td>
+          <td>
+            <div class="td-actions">
+              <a href="{{ url_for('kunci.edit', id=k.id) }}" class="btn btn-outline btn-sm" id="btn-edit-kunci-{{ k.id }}">
+                <i class="fa-solid fa-pen-to-square"></i>
+              </a>
+              <button type="button" class="btn btn-danger btn-sm"
+                data-delete-url="{{ url_for('kunci.hapus', id=k.id) }}"
+                data-delete-name="kunci jawaban soal {{ k.nomor_soal }}"
+                id="btn-hapus-kunci-{{ k.id }}">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% else %}
+  <div class="empty-state">
+    <div class="empty-icon">🔑</div>
+    <h3>Belum Ada Kunci Jawaban</h3>
+    <p>Tambahkan kunci jawaban untuk mata pelajaran yang dipilih.</p>
+    <a href="{{ url_for('kunci.tambah') }}" class="btn btn-primary mt-2">
+      <i class="fa-solid fa-plus"></i> Tambah Kunci
+    </a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

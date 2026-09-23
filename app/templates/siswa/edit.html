@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block title %}Edit Siswa{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>Edit Siswa</h1>
+  <div class="breadcrumb">
+    <a href="{{ url_for('siswa.index') }}" class="text-muted">Data Siswa</a> ›
+    <span>Edit — {{ siswa.nama }}</span>
+  </div>
+</div>
+
+<div class="card" style="max-width:560px;">
+  <div class="card-header">
+    <span class="card-title"><i class="fa-solid fa-pen-to-square text-purple" style="margin-right:8px;"></i>Edit Data Siswa</span>
+    <span class="badge badge-gray">ID #{{ siswa.id }}</span>
+  </div>
+
+  <form method="POST" action="{{ url_for('siswa.edit', id=siswa.id) }}" novalidate id="form-edit-siswa">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+
+    <div class="form-group">
+      <label class="form-label" for="nama">Nama Lengkap</label>
+      <input type="text" id="nama" name="nama" class="form-control"
+             value="{{ siswa.nama }}" required/>
+    </div>
+
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label" for="nis">NIS</label>
+        <input type="text" id="nis" name="nis" class="form-control"
+               value="{{ siswa.nis }}" required/>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="kelas">Kelas</label>
+        <input type="text" id="kelas" name="kelas" class="form-control"
+               value="{{ siswa.kelas }}" required/>
+      </div>
+    </div>
+
+    <div class="flex gap-3 mt-2">
+      <button type="submit" class="btn btn-primary" id="btn-update-siswa">
+        <i class="fa-solid fa-floppy-disk"></i> Perbarui
+      </button>
+      <a href="{{ url_for('siswa.index') }}" class="btn btn-outline">
+        <i class="fa-solid fa-arrow-left"></i> Batal
+      </a>
+    </div>
+  </form>
+</div>
+{% endblock %}

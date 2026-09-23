@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+{% block title %}Laporan Penilaian{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>Laporan Penilaian</h1>
+  <div class="breadcrumb">Penilaian › <span>Laporan</span></div>
+</div>
+
+<!-- Filter -->
+<div class="card mb-3">
+  <form method="GET" action="{{ url_for('laporan.index') }}" class="flex gap-3 flex-wrap" id="filter-laporan">
+    <div class="form-group mb-0" style="flex:1;min-width:180px;">
+      <label class="form-label" for="mapel_id">Mata Pelajaran</label>
+      <select name="mapel_id" id="mapel-filter" class="form-select">
+        <option value="">Semua Mata Pelajaran</option>
+        {% for m in mapel_list %}
+        <option value="{{ m.id }}" {% if selected_mapel == m.id %}selected{% endif %}>[{{ m.kode }}] {{ m.nama }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="form-group mb-0" style="min-width:140px;">
+      <label class="form-label" for="kelas">Kelas</label>
+      <select name="kelas" id="kelas-filter" class="form-select">
+        <option value="">Semua Kelas</option>
+        {% for k in kelas_list %}
+        <option value="{{ k }}" {% if selected_kelas == k %}selected{% endif %}>{{ k }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div style="padding-top:22px;display:flex;gap:8px;">
+      <button type="submit" class="btn btn-primary" id="btn-filter-laporan">
+        <i class="fa-solid fa-filter"></i> Filter
+      </button>
+      <a href="{{ url_for('laporan.index') }}" class="btn btn-outline">Reset</a>
+    </div>
+  </form>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <span class="card-title">
+      <i class="fa-solid fa-chart-bar text-purple" style="margin-right:8px;"></i>
+      Hasil Penilaian
+      <span class="badge badge-purple" style="margin-left:8px;">{{ hasil_list.total }}</span>
+    </span>
+    <div class="flex gap-2">
+      <a href="{{ url_for('laporan.export_excel', mapel_id=selected_mapel or '', kelas=selected_kelas or '') }}"
+         class="btn btn-success btn-sm" id="btn-export-excel">
+        <i class="fa-solid fa-file-excel"></i> Export Excel
+      </a>
+    </div>
+  </div>
+
+  {% if hasil_list.items %}
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Nama Siswa</th>
+          <th>NIS</th>
+          <th>Kelas</th>
+          <th>Mata Pelajaran</th>
+          <th>Skor</th>
+          <th>Status</th>
+          <th>Tanggal</th>
+          <th>Aksi</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for hasil in hasil_list.items %}
+        {% set lembar = hasil.lembar_jawaban %}
+        {% set siswa  = lembar.siswa %}
+        {% set mapel  = lembar.mata_pelajaran %}
+        <tr>
+          <td class="text-muted">{{ loop.index + (hasil_list.page - 1) * hasil_list.per_page }}</td>
+          <td class="fw-bold">{{ siswa.nama }}</td>
+          <td class="text-sm" style="color:var(--accent-cyan);">{{ siswa.nis }}</td>
+          <td><span class="badge badge-purple">{{ siswa.kelas }}</span></td>
+          <td>
+            <span class="badge badge-cyan">{{ mapel.kode }}</span>
+            <span class="text-sm text-muted" style="margin-left:4px;">{{ mapel.nama }}</span>
+          </td>
+          <td>
+            {% if hasil.skor is not none %}
+            <span class="fw-bold"
+              style="color:{% if hasil.skor >= 75 %}var(--accent-green){% elif hasil.skor >= 50 %}var(--accent-orange){% else %}var(--accent-red){% endif %}">
+              {{ hasil.skor }}
+            </span>
+            {% else %}
+            <span class="text-muted">—</span>
+            {% endif %}
+          </td>
+          <td><span class="badge status-{{ lembar.status }}">{{ lembar.status|title }}</span></td>
+          <td class="text-sm text-muted">{{ hasil.created_at.strftime('%d %b %Y') }}</td>
+          <td>
+            <a href="{{ url_for('laporan.detail', id=hasil.id) }}" class="btn btn-outline btn-sm"
+               id="btn-detail-laporan-{{ hasil.id }}" title="Lihat Detail">
+              <i class="fa-solid fa-eye"></i>
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  {% if hasil_list.pages > 1 %}
+  <div class="pagination">
+    {% for p in hasil_list.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+      {% if p %}
+        <a href="{{ url_for('laporan.index', page=p, mapel_id=selected_mapel or '', kelas=selected_kelas or '') }}"
+           class="page-btn {% if p == hasil_list.page %}active{% endif %}">{{ p }}</a>
+      {% else %}
+        <span class="page-btn" style="pointer-events:none;">…</span>
+      {% endif %}
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% else %}
+  <div class="empty-state">
+    <div class="empty-icon">📊</div>
+    <h3>Tidak Ada Data Laporan</h3>
+    <p>Belum ada hasil penilaian yang tersedia{% if selected_mapel or selected_kelas %} untuk filter yang dipilih{% endif %}.</p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

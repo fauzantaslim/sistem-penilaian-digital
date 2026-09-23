@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+{% block title %}Kelola Siswa{% endblock %}
+
+{% block content %}
+<div class="page-header flex-between">
+  <div>
+    <h1>Data Siswa</h1>
+    <div class="breadcrumb">Kelola Data › <span>Siswa</span></div>
+  </div>
+  <a href="{{ url_for('siswa.tambah') }}" class="btn btn-primary" id="btn-tambah-siswa">
+    <i class="fa-solid fa-user-plus"></i> Tambah Siswa
+  </a>
+</div>
+
+<!-- Search & Info -->
+<div class="card mb-3">
+  <form method="GET" action="{{ url_for('siswa.index') }}" class="flex-between gap-3">
+    <div class="search-bar" style="flex:1;">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input type="text" name="q" value="{{ search }}" placeholder="Cari nama, NIS, atau kelas..." id="search-siswa"/>
+    </div>
+    <button type="submit" class="btn btn-outline">Cari</button>
+    {% if search %}
+      <a href="{{ url_for('siswa.index') }}" class="btn btn-outline">Reset</a>
+    {% endif %}
+  </form>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <span class="card-title">
+      <i class="fa-solid fa-users text-purple" style="margin-right:8px;"></i>
+      Daftar Siswa
+      <span class="badge badge-purple" style="margin-left:8px;">{{ siswa_list.total }}</span>
+    </span>
+  </div>
+
+  {% if siswa_list.items %}
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Nama Siswa</th>
+          <th>NIS</th>
+          <th>Kelas</th>
+          <th>Terdaftar</th>
+          <th>Aksi</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for siswa in siswa_list.items %}
+        <tr>
+          <td class="text-muted">{{ loop.index + (siswa_list.page - 1) * siswa_list.per_page }}</td>
+          <td class="fw-bold">{{ siswa.nama }}</td>
+          <td><code style="color:var(--accent-cyan);font-size:12px;">{{ siswa.nis }}</code></td>
+          <td><span class="badge badge-purple">{{ siswa.kelas }}</span></td>
+          <td class="text-sm text-muted">{{ siswa.created_at.strftime('%d %b %Y') }}</td>
+          <td>
+            <div class="td-actions">
+              <a href="{{ url_for('siswa.edit', id=siswa.id) }}" class="btn btn-outline btn-sm" id="btn-edit-siswa-{{ siswa.id }}">
+                <i class="fa-solid fa-pen-to-square"></i>
+              </a>
+              <button type="button" class="btn btn-danger btn-sm"
+                data-delete-url="{{ url_for('siswa.hapus', id=siswa.id) }}"
+                data-delete-name="{{ siswa.nama }}"
+                id="btn-hapus-siswa-{{ siswa.id }}">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  {% if siswa_list.pages > 1 %}
+  <div class="pagination">
+    {% if siswa_list.has_prev %}
+      <a href="{{ url_for('siswa.index', page=siswa_list.prev_num, q=search) }}" class="page-btn">
+        <i class="fa-solid fa-chevron-left"></i>
+      </a>
+    {% else %}
+      <span class="page-btn disabled"><i class="fa-solid fa-chevron-left"></i></span>
+    {% endif %}
+
+    {% for p in siswa_list.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+      {% if p %}
+        <a href="{{ url_for('siswa.index', page=p, q=search) }}"
+           class="page-btn {% if p == siswa_list.page %}active{% endif %}">{{ p }}</a>
+      {% else %}
+        <span class="page-btn" style="pointer-events:none;">…</span>
+      {% endif %}
+    {% endfor %}
+
+    {% if siswa_list.has_next %}
+      <a href="{{ url_for('siswa.index', page=siswa_list.next_num, q=search) }}" class="page-btn">
+        <i class="fa-solid fa-chevron-right"></i>
+      </a>
+    {% else %}
+      <span class="page-btn disabled"><i class="fa-solid fa-chevron-right"></i></span>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  {% else %}
+  <div class="empty-state">
+    <div class="empty-icon">👥</div>
+    <h3>{% if search %}Tidak ada siswa yang cocok{% else %}Belum Ada Data Siswa{% endif %}</h3>
+    <p>{% if search %}Coba kata kunci lain.{% else %}Mulai dengan menambahkan data siswa pertama.{% endif %}</p>
+    {% if not search %}
+    <a href="{{ url_for('siswa.tambah') }}" class="btn btn-primary mt-2">
+      <i class="fa-solid fa-user-plus"></i> Tambah Siswa
+    </a>
+    {% endif %}
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Login ke Sistem Penilaian Digital"/>
+  <title>Login | SistemPenilaian</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'sans-serif'] },
+          colors: {
+            primary: '#7acbaf',
+            'primary-dark': '#65b59a',
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased min-h-screen flex items-center justify-center p-4 relative">
+
+  <!-- Floating Shapes -->
+  <div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-primary/20 blur-3xl pointer-events-none"></div>
+  <div class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-blue-300/20 blur-3xl pointer-events-none"></div>
+
+  <!-- Flash Messages -->
+  <div class="fixed top-4 right-4 z-50 flex flex-col gap-2" id="flash-container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        <div class="flex items-center p-4 mb-4 text-sm rounded-lg shadow-sm border 
+          {% if category == 'success' %}text-green-800 border-green-300 bg-green-50
+          {% elif category == 'danger' %}text-red-800 border-red-300 bg-red-50
+          {% elif category == 'warning' %}text-orange-800 border-orange-300 bg-orange-50
+          {% else %}text-blue-800 border-blue-300 bg-blue-50{% endif %}" role="alert">
+          <i class="fa-solid mr-3
+            {% if category == 'success' %}fa-circle-check
+            {% elif category == 'danger' %}fa-circle-xmark
+            {% elif category == 'warning' %}fa-triangle-exclamation
+            {% else %}fa-circle-info{% endif %}"></i>
+          <div>{{ message }}</div>
+          <button class="ml-auto -mx-1.5 -my-1.5 rounded-lg focus:ring-2 p-1.5 inline-flex h-8 w-8 hover:bg-black/5" onclick="this.parentElement.remove()" aria-label="Tutup">&times;</button>
+        </div>
+      {% endfor %}
+    {% endwith %}
+  </div>
+
+  <div class="bg-white border border-gray-200 rounded-2xl shadow-xl w-full max-w-md p-8 relative z-10">
+    <div class="text-center mb-8">
+      <div class="text-5xl mb-4">🎓</div>
+      <h1 class="text-2xl font-bold text-gray-900">Selamat Datang Kembali</h1>
+      <p class="text-sm text-gray-500 mt-2">Login ke Sistem Penilaian Digital</p>
+    </div>
+
+    <form method="POST" action="{{ url_for('auth.login') }}" novalidate>
+      {{ form.hidden_tag() }}
+      
+      <div class="mb-5">
+        <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Username</label>
+        <div class="relative">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <i class="fa-solid fa-user text-gray-400 text-sm"></i>
+          </div>
+          {{ form.username(class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-sm", placeholder="Masukkan username", autofocus=True) }}
+        </div>
+        {% for error in form.username.errors %}
+          <span class="text-xs text-red-500 mt-1 block">{{ error }}</span>
+        {% endfor %}
+      </div>
+
+      <div class="mb-6">
+        <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+        <div class="relative">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <i class="fa-solid fa-lock text-gray-400 text-sm"></i>
+          </div>
+          {{ form.password(class="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-sm", placeholder="••••••••", id="password-input") }}
+          <button type="button" id="toggle-password" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none" aria-label="Toggle password visibility">
+            <i class="fa-regular fa-eye" id="toggle-icon"></i>
+          </button>
+        </div>
+        {% for error in form.password.errors %}
+          <span class="text-xs text-red-500 mt-1 block">{{ error }}</span>
+        {% endfor %}
+      </div>
+
+      <button type="submit" class="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors">
+        Masuk <i class="fa-solid fa-arrow-right-to-bracket ml-2"></i>
+      </button>
+    </form>
+
+    <div class="mt-8 text-center text-sm text-gray-500">
+      Belum punya akun guru? 
+      <a href="{{ url_for('auth.register') }}" class="font-medium text-primary hover:text-primary-dark transition-colors">Daftar sekarang</a>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  <script>
+    const toggleBtn = document.getElementById('toggle-password');
+    const pwdInput = document.getElementById('password-input');
+    const toggleIcon = document.getElementById('toggle-icon');
+
+    if (toggleBtn && pwdInput && toggleIcon) {
+      toggleBtn.addEventListener('click', () => {
+        const type = pwdInput.getAttribute('type') === 'password' ? 'text' : 'password';
+        pwdInput.setAttribute('type', type);
+        toggleIcon.className = type === 'password' ? 'fa-regular fa-eye' : 'fa-regular fa-eye-slash';
+      });
+    }
+  </script>
+</body>
+</html>
