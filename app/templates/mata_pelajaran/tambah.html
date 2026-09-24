@@ -1,35 +1,72 @@
 {% extends 'base.html' %}
 {% block title %}Tambah Mata Pelajaran{% endblock %}
+{% block page_title %}Tambah Mata Pelajaran{% endblock %}
+
 {% block content %}
-<div class="page-header">
-  <h1>Tambah Mata Pelajaran</h1>
-  <div class="breadcrumb"><a href="{{ url_for('mapel.index') }}" class="text-muted">Mata Pelajaran</a> › <span>Tambah</span></div>
-</div>
-<div class="card" style="max-width:560px;">
-  <div class="card-header">
-    <span class="card-title"><i class="fa-solid fa-plus text-cyan" style="margin-right:8px;"></i>Form Tambah Mata Pelajaran</span>
+<!-- Form Card -->
+<div class="w-full animate-fade-in animate-in-1">
+  <div class="bg-transparent border border-gray-200/80 rounded-3xl overflow-hidden">
+    <!-- Card Header -->
+    <div class="px-8 py-5 bg-gray-900 text-white flex items-center gap-3">
+      <i class="ph-fill ph-books text-cyan-400 text-2xl"></i>
+      <div>
+        <h2 class="font-display font-bold text-white">Form Tambah Mapel</h2>
+        <p class="text-xs text-gray-300 mt-0.5">Isi semua data yang diperlukan</p>
+      </div>
+    </div>
+
+    <!-- Form Body -->
+    <form method="POST" action="{{ url_for('mapel.tambah') }}" novalidate class="p-8 space-y-6">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-2" for="nama">
+          Nama Mata Pelajaran <span class="text-red-400">*</span>
+        </label>
+        <div class="relative group">
+          <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+            <i class="ph ph-book-open-text text-gray-400 text-lg group-focus-within:text-cyan-500 transition-colors"></i>
+          </div>
+          <input type="text" id="nama" name="nama" required
+            class="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 transition-all text-sm placeholder-gray-400 shadow-sm"
+            placeholder="Contoh: Matematika" autofocus/>
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-2" for="kode">
+          Kode <span class="text-red-400">*</span>
+        </label>
+        <div class="relative group">
+          <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+            <i class="ph ph-barcode text-gray-400 text-lg group-focus-within:text-cyan-500 transition-colors"></i>
+          </div>
+          <input type="text" id="kode" name="kode" required maxlength="20"
+            class="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 transition-all text-sm placeholder-gray-400 shadow-sm"
+            placeholder="Contoh: MTK"/>
+        </div>
+        <p class="text-xs text-gray-500 mt-2 ml-1">Kode akan otomatis diubah ke huruf kapital.</p>
+      </div>
+
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-2" for="deskripsi">
+          Deskripsi <span class="text-gray-400 font-normal">(opsional)</span>
+        </label>
+        <textarea id="deskripsi" name="deskripsi" rows="3"
+          class="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 transition-all text-sm placeholder-gray-400 shadow-sm"
+          placeholder="Deskripsi singkat mata pelajaran..."></textarea>
+      </div>
+
+      <!-- Actions -->
+      <div class="flex gap-4 pt-4">
+        <button type="submit" class="flex-1 flex justify-center items-center gap-2 py-3.5 px-6 rounded-2xl font-bold text-white bg-cyan-500 hover:bg-cyan-600 shadow-lg shadow-cyan-200 hover:-translate-y-0.5 transition-all duration-200">
+          <i class="ph-bold ph-floppy-disk text-lg"></i> Simpan Mapel
+        </button>
+        <a href="{{ url_for('mapel.index') }}" class="flex-1 flex items-center justify-center gap-2 py-3.5 px-5 rounded-2xl font-semibold text-gray-600 bg-white border border-gray-200 hover:bg-gray-50 shadow-sm transition-all">
+          <i class="ph-bold ph-arrow-left"></i> Batal
+        </a>
+      </div>
+    </form>
   </div>
-  <form method="POST" action="{{ url_for('mapel.tambah') }}" novalidate id="form-tambah-mapel">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-    <div class="form-group">
-      <label class="form-label" for="nama">Nama Mata Pelajaran</label>
-      <input type="text" id="nama" name="nama" class="form-control" placeholder="Contoh: Matematika" required/>
-    </div>
-    <div class="form-group">
-      <label class="form-label" for="kode">Kode</label>
-      <input type="text" id="kode" name="kode" class="form-control" placeholder="Contoh: MTK" required maxlength="20"/>
-      <small class="text-muted text-sm">Kode akan otomatis diubah ke huruf kapital.</small>
-    </div>
-    <div class="form-group">
-      <label class="form-label" for="deskripsi">Deskripsi <span class="text-muted">(opsional)</span></label>
-      <textarea id="deskripsi" name="deskripsi" class="form-control" placeholder="Deskripsi singkat mata pelajaran..."></textarea>
-    </div>
-    <div class="flex gap-3 mt-2">
-      <button type="submit" class="btn btn-primary" id="btn-simpan-mapel">
-        <i class="fa-solid fa-floppy-disk"></i> Simpan
-      </button>
-      <a href="{{ url_for('mapel.index') }}" class="btn btn-outline"><i class="fa-solid fa-arrow-left"></i> Batal</a>
-    </div>
-  </form>
 </div>
 {% endblock %}

@@ -1,51 +1,77 @@
 {% extends 'base.html' %}
 {% block title %}Edit Siswa{% endblock %}
+{% block page_title %}Edit Siswa{% endblock %}
 
 {% block content %}
-<div class="page-header">
-  <h1>Edit Siswa</h1>
-  <div class="breadcrumb">
-    <a href="{{ url_for('siswa.index') }}" class="text-muted">Data Siswa</a> ›
-    <span>Edit — {{ siswa.nama }}</span>
-  </div>
-</div>
-
-<div class="card" style="max-width:560px;">
-  <div class="card-header">
-    <span class="card-title"><i class="fa-solid fa-pen-to-square text-purple" style="margin-right:8px;"></i>Edit Data Siswa</span>
-    <span class="badge badge-gray">ID #{{ siswa.id }}</span>
-  </div>
-
-  <form method="POST" action="{{ url_for('siswa.edit', id=siswa.id) }}" novalidate id="form-edit-siswa">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-
-    <div class="form-group">
-      <label class="form-label" for="nama">Nama Lengkap</label>
-      <input type="text" id="nama" name="nama" class="form-control"
-             value="{{ siswa.nama }}" required/>
-    </div>
-
-    <div class="form-grid">
-      <div class="form-group">
-        <label class="form-label" for="nis">NIS</label>
-        <input type="text" id="nis" name="nis" class="form-control"
-               value="{{ siswa.nis }}" required/>
+<!-- Form Card -->
+<div class="w-full animate-fade-in animate-in-1">
+  <div class="bg-transparent border border-gray-200/80 rounded-3xl overflow-hidden">
+    <!-- Card Header -->
+    <div class="px-8 py-5 bg-gray-900 text-white flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <i class="ph-fill ph-pencil-simple text-amber-400 text-2xl"></i>
+        <div>
+          <h2 class="font-display font-bold text-white">Edit Data Siswa</h2>
+          <p class="text-xs text-gray-300 mt-0.5">Perbarui data siswa yang dipilih</p>
+        </div>
       </div>
-      <div class="form-group">
-        <label class="form-label" for="kelas">Kelas</label>
-        <input type="text" id="kelas" name="kelas" class="form-control"
-               value="{{ siswa.kelas }}" required/>
-      </div>
+      <span class="bg-gray-800 text-gray-300 border border-gray-700 text-xs font-bold px-3 py-1 rounded-full">ID #{{ siswa.id }}</span>
     </div>
 
-    <div class="flex gap-3 mt-2">
-      <button type="submit" class="btn btn-primary" id="btn-update-siswa">
-        <i class="fa-solid fa-floppy-disk"></i> Perbarui
-      </button>
-      <a href="{{ url_for('siswa.index') }}" class="btn btn-outline">
-        <i class="fa-solid fa-arrow-left"></i> Batal
-      </a>
-    </div>
-  </form>
+    <!-- Form Body -->
+    <form method="POST" action="{{ url_for('siswa.edit', id=siswa.id) }}" novalidate class="p-8 space-y-6">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-2" for="nama">
+          Nama Lengkap <span class="text-red-400">*</span>
+        </label>
+        <div class="relative group">
+          <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+            <i class="ph ph-identification-card text-gray-400 text-lg group-focus-within:text-amber-500 transition-colors"></i>
+          </div>
+          <input type="text" id="nama" name="nama" value="{{ siswa.nama }}" required
+            class="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-amber-400 focus:border-amber-400 transition-all text-sm shadow-sm"/>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-6">
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-2" for="nis">
+            NIS <span class="text-red-400">*</span>
+          </label>
+          <div class="relative group">
+            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+              <i class="ph ph-hash text-gray-400 text-lg group-focus-within:text-amber-500 transition-colors"></i>
+            </div>
+            <input type="text" id="nis" name="nis" value="{{ siswa.nis }}" required
+              class="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-amber-400 focus:border-amber-400 transition-all text-sm shadow-sm"/>
+          </div>
+        </div>
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-2" for="kelas">
+            Kelas <span class="text-red-400">*</span>
+          </label>
+          <div class="relative group">
+            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+              <i class="ph ph-chalkboard-teacher text-gray-400 text-lg group-focus-within:text-amber-500 transition-colors"></i>
+            </div>
+            <input type="text" id="kelas" name="kelas" value="{{ siswa.kelas }}" required
+              class="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-amber-400 focus:border-amber-400 transition-all text-sm shadow-sm"/>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="flex gap-4 pt-4">
+        <button type="submit" class="flex-1 flex justify-center items-center gap-2 py-3.5 px-6 rounded-2xl font-bold text-white bg-amber-500 hover:bg-amber-600 shadow-lg shadow-amber-200 hover:-translate-y-0.5 transition-all duration-200">
+          <i class="ph-bold ph-floppy-disk text-lg"></i> Perbarui Siswa
+        </button>
+        <a href="{{ url_for('siswa.index') }}" class="flex-1 flex items-center justify-center gap-2 py-3.5 px-5 rounded-2xl font-semibold text-gray-600 bg-white border border-gray-200 hover:bg-gray-50 shadow-sm transition-all">
+          <i class="ph-bold ph-arrow-left"></i> Batal
+        </a>
+      </div>
+    </form>
+  </div>
 </div>
 {% endblock %}

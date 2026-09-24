@@ -1,100 +1,141 @@
 {% extends 'base.html' %}
 {% block title %}Upload Lembar Jawaban{% endblock %}
+{% block page_title %}Upload{% endblock %}
 
 {% block content %}
-<div class="page-header">
-  <h1>Upload Lembar Jawaban</h1>
-  <div class="breadcrumb">Penilaian › <span>Upload</span></div>
+<div class="mb-10 animate-fade-in flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
+  <div>
+    <h1 class="font-display text-4xl font-bold text-gray-900 tracking-tight mb-2">Upload Lembar Jawaban</h1>
+    <div class="text-gray-500 font-medium text-lg flex items-center gap-2">
+      <span>Penilaian</span>
+      <i class="ph-bold ph-caret-right text-sm"></i>
+      <span class="text-gray-800">Upload</span>
+    </div>
+  </div>
 </div>
 
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start;" class="upload-grid">
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
 
   <!-- Upload Form -->
-  <div class="card">
-    <div class="card-header">
-      <span class="card-title"><i class="fa-solid fa-cloud-arrow-up text-purple" style="margin-right:8px;"></i>Form Upload</span>
+  <div class="card p-0 overflow-hidden animate-fade-in animate-in-1">
+    <div class="p-6 border-b border-gray-100 bg-white/50">
+      <h3 class="font-display text-xl font-bold text-gray-800 flex items-center gap-2">
+        <i class="ph-fill ph-cloud-arrow-up text-primary"></i> Form Upload
+      </h3>
     </div>
 
-    <form method="POST" action="{{ url_for('upload.index') }}" enctype="multipart/form-data" novalidate id="upload-form">
-      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+    <div class="p-6">
+      <form method="POST" action="{{ url_for('upload.index') }}" enctype="multipart/form-data" novalidate id="upload-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
 
-      <div class="form-group">
-        <label class="form-label" for="siswa_id">Siswa</label>
-        <select id="siswa_id" name="siswa_id" class="form-select" required>
-          <option value="">— Pilih Siswa —</option>
-          {% for s in siswa_list %}
-          <option value="{{ s.id }}">[{{ s.kelas }}] {{ s.nama }}</option>
-          {% endfor %}
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label" for="mapel_id">Mata Pelajaran</label>
-        <select id="mapel_id" name="mapel_id" class="form-select" required>
-          <option value="">— Pilih Mata Pelajaran —</option>
-          {% for m in mapel_list %}
-          <option value="{{ m.id }}">[{{ m.kode }}] {{ m.nama }}</option>
-          {% endfor %}
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">File Lembar Jawaban</label>
-        <div class="upload-zone" id="upload-zone">
-          <input type="file" id="file-input" name="files" accept=".jpg,.jpeg,.png" multiple/>
-          <div class="upload-icon">📄</div>
-          <h3>Seret & Lepas File di Sini</h3>
-          <p>atau klik untuk memilih file</p>
-          <div class="upload-hint">
-            <i class="fa-solid fa-circle-info"></i>
-            Format didukung: JPG, JPEG, PNG · Maks. 16 MB per file
+        <div class="mb-5">
+          <label class="block text-sm font-semibold text-gray-600 mb-2 ml-1" for="siswa_id">Siswa</label>
+          <div class="relative group">
+            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+              <i class="ph ph-student text-gray-400 text-lg group-focus-within:text-primary transition-colors"></i>
+            </div>
+            <select id="siswa_id" name="siswa_id" required
+              class="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-100 rounded-xl focus:bg-white focus:ring-2 focus:ring-primary focus:border-primary transition-all text-sm appearance-none">
+              <option value="">— Pilih Siswa —</option>
+              {% for s in siswa_list %}
+              <option value="{{ s.id }}">[{{ s.kelas }}] {{ s.nama }}</option>
+              {% endfor %}
+            </select>
+            <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
+              <i class="ph ph-caret-down text-gray-400 text-sm"></i>
+            </div>
           </div>
         </div>
-        <div id="preview-grid" class="preview-grid"></div>
-      </div>
 
-      <button type="submit" class="btn btn-primary w-100" id="btn-upload">
-        <i class="fa-solid fa-cloud-arrow-up"></i> Upload Sekarang
-      </button>
-    </form>
+        <div class="mb-5">
+          <label class="block text-sm font-semibold text-gray-600 mb-2 ml-1" for="mapel_id">Mata Pelajaran</label>
+          <div class="relative group">
+            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+              <i class="ph ph-books text-gray-400 text-lg group-focus-within:text-primary transition-colors"></i>
+            </div>
+            <select id="mapel_id" name="mapel_id" required
+              class="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-100 rounded-xl focus:bg-white focus:ring-2 focus:ring-primary focus:border-primary transition-all text-sm appearance-none">
+              <option value="">— Pilih Mata Pelajaran —</option>
+              {% for m in mapel_list %}
+              <option value="{{ m.id }}">[{{ m.kode }}] {{ m.nama }}</option>
+              {% endfor %}
+            </select>
+            <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
+              <i class="ph ph-caret-down text-gray-400 text-sm"></i>
+            </div>
+          </div>
+        </div>
+
+        <div class="mb-6">
+          <label class="block text-sm font-semibold text-gray-600 mb-2 ml-1">File Lembar Jawaban</label>
+          <div class="upload-zone" id="upload-zone">
+            <input type="file" id="file-input" name="files" accept=".jpg,.jpeg,.png" multiple/>
+            <div class="flex flex-col items-center justify-center gap-3 pointer-events-none">
+              <div class="w-16 h-16 rounded-2xl bg-primary/10 text-primary flex items-center justify-center text-3xl">
+                <i class="ph-fill ph-file-image"></i>
+              </div>
+              <div>
+                <h3 class="font-display font-bold text-gray-800 text-center">Seret &amp; Lepas File di Sini</h3>
+                <p class="text-gray-500 text-sm text-center mt-1">atau klik untuk memilih file</p>
+              </div>
+              <div class="flex items-center gap-2 text-xs text-gray-400 bg-gray-50 px-4 py-2 rounded-full">
+                <i class="ph ph-info"></i>
+                JPG, JPEG, PNG · Maks. 16 MB per file
+              </div>
+            </div>
+          </div>
+          <div id="preview-grid" class="preview-grid"></div>
+        </div>
+
+        <button type="submit" class="w-full flex justify-center items-center gap-2 py-4 px-4 rounded-2xl shadow-[0_8px_20px_rgba(122,203,175,0.3)] font-bold text-white bg-primary hover:bg-primary-dark hover:-translate-y-1 transition-all duration-300" id="btn-upload">
+          <i class="ph-bold ph-cloud-arrow-up text-lg"></i> Upload Sekarang
+        </button>
+      </form>
+    </div>
   </div>
 
   <!-- Upload History -->
-  <div class="card">
-    <div class="card-header">
-      <span class="card-title"><i class="fa-solid fa-clock-rotate-left text-cyan" style="margin-right:8px;"></i>Riwayat Upload</span>
-      <span class="badge badge-gray">{{ history.total }} file</span>
+  <div class="card p-0 overflow-hidden animate-fade-in animate-in-2">
+    <div class="p-6 border-b border-gray-100 bg-white/50 flex justify-between items-center">
+      <h3 class="font-display text-xl font-bold text-gray-800 flex items-center gap-2">
+        <i class="ph-fill ph-clock-counter-clockwise text-indigo-500"></i> Riwayat Upload
+      </h3>
+      <span class="bg-gray-100 text-gray-600 font-bold px-3 py-1 rounded-full text-sm">{{ history.total }} file</span>
     </div>
 
     {% if history.items %}
-    <div style="display:flex;flex-direction:column;gap:10px;">
+    <div class="divide-y divide-gray-100">
       {% for lembar in history.items %}
-      <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);">
+      <div class="p-4 flex items-center gap-4 hover:bg-gray-50/80 transition-colors group">
         <!-- Thumbnail -->
-        <div style="width:44px;height:44px;border-radius:8px;overflow:hidden;background:var(--bg-secondary);flex-shrink:0;">
+        <div class="w-12 h-12 rounded-xl overflow-hidden bg-gray-100 flex-shrink-0 flex items-center justify-center">
           <img src="{{ url_for('static', filename='uploads/' + lembar.file_path.split('\\')[-1].split('/')[-1]) }}"
-               alt="{{ lembar.filename }}" style="width:100%;height:100%;object-fit:cover;"
-               onerror="this.style.display='none';this.parentElement.innerHTML='<div style=\'display:flex;align-items:center;justify-content:center;height:100%;font-size:20px;\'>📄</div>';"/>
+               alt="{{ lembar.filename }}" class="w-full h-full object-cover"
+               onerror="this.style.display='none';this.parentElement.innerHTML='<i class=\'ph-fill ph-file-image text-gray-400 text-2xl\'></i>';"/>
         </div>
-        <div style="flex:1;min-width:0;">
-          <div class="fw-bold text-sm" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
-            {{ lembar.siswa.nama }}
-          </div>
-          <div class="text-muted" style="font-size:11px;">
-            {{ lembar.mata_pelajaran.kode }} · {{ lembar.uploaded_at.strftime('%d %b %Y %H:%M') }}
+        <div class="flex-1 min-w-0">
+          <div class="font-bold text-gray-900 text-sm truncate">{{ lembar.siswa.nama }}</div>
+          <div class="text-gray-400 text-xs mt-0.5 flex items-center gap-2">
+            <span class="font-semibold text-indigo-500">{{ lembar.mata_pelajaran.kode }}</span>
+            <span>·</span>
+            <span>{{ lembar.uploaded_at.strftime('%d %b %Y %H:%M') }}</span>
           </div>
         </div>
-        <span class="badge status-{{ lembar.status }}">
-          {% if lembar.status == 'pending' %}⏳ Menunggu
-          {% elif lembar.status == 'processing' %}⚙️ Proses
-          {% elif lembar.status == 'done' %}✅ Selesai
-          {% else %}❌ Error{% endif %}
+        <span class="text-xs font-bold px-2.5 py-1 rounded-full shrink-0
+          {% if lembar.status == 'pending' %}bg-amber-100 text-amber-700
+          {% elif lembar.status == 'processing' %}bg-blue-100 text-blue-700
+          {% elif lembar.status == 'done' %}bg-emerald-100 text-emerald-700
+          {% else %}bg-red-100 text-red-700{% endif %}">
+          {% if lembar.status == 'pending' %}Menunggu
+          {% elif lembar.status == 'processing' %}Proses
+          {% elif lembar.status == 'done' %}Selesai
+          {% else %}Error{% endif %}
         </span>
-        <form method="POST" action="{{ url_for('upload.hapus', id=lembar.id) }}" style="margin:0;">
+        <form method="POST" action="{{ url_for('upload.hapus', id=lembar.id) }}" class="m-0">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-          <button type="submit" class="btn btn-danger btn-sm" title="Hapus"
+          <button type="submit" class="w-9 h-9 inline-flex items-center justify-center rounded-xl bg-gray-100 text-gray-500 hover:bg-red-100 hover:text-red-600 transition-colors opacity-0 group-hover:opacity-100" title="Hapus"
                   onclick="return confirm('Hapus lembar ini?')">
-            <i class="fa-solid fa-trash"></i>
+            <i class="ph-bold ph-trash text-sm"></i>
           </button>
         </form>
       </div>
@@ -102,31 +143,29 @@
     </div>
 
     {% if history.pages > 1 %}
-    <div class="pagination mt-3">
-      {% for p in history.iter_pages() %}
-        {% if p %}
-          <a href="{{ url_for('upload.index', page=p) }}"
-             class="page-btn {% if p == history.page %}active{% endif %}">{{ p }}</a>
-        {% endif %}
-      {% endfor %}
+    <div class="p-5 border-t border-gray-100 bg-gray-50/50 flex justify-center">
+      <div class="inline-flex bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+        {% for p in history.iter_pages() %}
+          {% if p %}
+            <a href="{{ url_for('upload.index', page=p) }}"
+               class="px-4 py-2 text-sm font-medium border-r border-gray-200 hover:bg-gray-50 {% if p == history.page %}bg-primary text-white hover:bg-primary border-primary{% else %}text-gray-600{% endif %}">
+              {{ p }}
+            </a>
+          {% endif %}
+        {% endfor %}
+      </div>
     </div>
     {% endif %}
 
     {% else %}
-    <div class="empty-state">
-      <div class="empty-icon">📤</div>
-      <h3>Belum Ada Upload</h3>
-      <p>Upload lembar jawaban pertama Anda.</p>
+    <div class="p-12 flex flex-col items-center justify-center text-center">
+      <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center text-4xl text-gray-300 mb-4">
+        <i class="ph-fill ph-upload-simple"></i>
+      </div>
+      <h3 class="font-display text-lg font-bold text-gray-800 mb-2">Belum Ada Upload</h3>
+      <p class="text-gray-500 text-sm">Upload lembar jawaban pertama Anda melalui form di samping.</p>
     </div>
     {% endif %}
   </div>
 </div>
-{% endblock %}
-
-{% block scripts %}
-<style>
-  @media (max-width: 900px) {
-    .upload-grid { grid-template-columns: 1fr !important; }
-  }
-</style>
 {% endblock %}

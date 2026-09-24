@@ -1,42 +1,84 @@
 {% extends 'base.html' %}
 {% block title %}Edit Kunci Jawaban{% endblock %}
+{% block page_title %}Edit Kunci Jawaban{% endblock %}
+
 {% block content %}
-<div class="page-header">
-  <h1>Edit Kunci Jawaban</h1>
-  <div class="breadcrumb"><a href="{{ url_for('kunci.index') }}" class="text-muted">Kunci Jawaban</a> › <span>Edit Soal {{ kunci.nomor_soal }}</span></div>
-</div>
-<div class="card" style="max-width:560px;">
-  <div class="card-header">
-    <span class="card-title"><i class="fa-solid fa-pen-to-square text-orange" style="margin-right:8px;"></i>Edit Kunci Jawaban</span>
+<!-- Form Card -->
+<div class="w-full animate-fade-in animate-in-1">
+  <div class="bg-transparent border border-gray-200/80 rounded-3xl overflow-hidden">
+    <!-- Card Header -->
+    <div class="px-8 py-5 bg-gray-900 text-white flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <i class="ph-fill ph-pencil-simple text-orange-400 text-2xl"></i>
+        <div>
+          <h2 class="font-display font-bold text-white">Edit Kunci Jawaban</h2>
+          <p class="text-xs text-gray-300 mt-0.5">Perbarui kunci jawaban soal {{ kunci.nomor_soal }}</p>
+        </div>
+      </div>
+      <span class="bg-gray-800 text-gray-300 border border-gray-700 text-xs font-bold px-3 py-1 rounded-full">ID #{{ kunci.id }}</span>
+    </div>
+
+    <!-- Form Body -->
+    <form method="POST" action="{{ url_for('kunci.edit', id=kunci.id) }}" novalidate class="p-8 space-y-6">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-2">
+          Mata Pelajaran
+        </label>
+        <div class="relative group opacity-60 cursor-not-allowed">
+          <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+            <i class="ph ph-books text-gray-400 text-lg"></i>
+          </div>
+          <input type="text" value="{{ kunci.mata_pelajaran.nama }}" readonly
+            class="w-full pl-11 pr-4 py-3 bg-gray-100 border border-gray-200 rounded-xl text-sm text-gray-600 cursor-not-allowed pointer-events-none shadow-sm"/>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-6">
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-2">
+            Nomor Soal
+          </label>
+          <div class="relative group opacity-60 cursor-not-allowed">
+            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+              <i class="ph ph-list-numbers text-gray-400 text-lg"></i>
+            </div>
+            <input type="text" value="Soal {{ kunci.nomor_soal }}" readonly
+              class="w-full pl-11 pr-4 py-3 bg-gray-100 border border-gray-200 rounded-xl text-sm text-gray-600 cursor-not-allowed pointer-events-none shadow-sm"/>
+          </div>
+        </div>
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-2" for="jawaban_benar">
+            Jawaban Benar <span class="text-red-400">*</span>
+          </label>
+          <div class="relative group">
+            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+              <i class="ph ph-check-circle text-gray-400 text-lg group-focus-within:text-orange-500 transition-colors"></i>
+            </div>
+            <select id="jawaban_benar" name="jawaban_benar" required
+              class="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition-all text-sm appearance-none cursor-pointer shadow-sm">
+              {% for o in opsi %}
+              <option value="{{ o }}" {% if o == kunci.jawaban_benar %}selected{% endif %}>{{ o }}</option>
+              {% endfor %}
+            </select>
+            <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
+              <i class="ph ph-caret-down text-gray-400"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="flex gap-4 pt-4">
+        <button type="submit" class="flex-1 flex justify-center items-center gap-2 py-3.5 px-6 rounded-2xl font-bold text-white bg-orange-500 hover:bg-orange-600 shadow-lg shadow-orange-200 hover:-translate-y-0.5 transition-all duration-200">
+          <i class="ph-bold ph-floppy-disk text-lg"></i> Perbarui Kunci
+        </button>
+        <a href="{{ url_for('kunci.index', mapel_id=kunci.mapel_id) }}" class="flex-1 flex items-center justify-center gap-2 py-3.5 px-5 rounded-2xl font-semibold text-gray-600 bg-white border border-gray-200 hover:bg-gray-50 shadow-sm transition-all">
+          <i class="ph-bold ph-arrow-left"></i> Batal
+        </a>
+      </div>
+    </form>
   </div>
-  <form method="POST" action="{{ url_for('kunci.edit', id=kunci.id) }}" novalidate id="form-edit-kunci">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-    <div class="form-group">
-      <label class="form-label">Mata Pelajaran</label>
-      <input type="text" class="form-control" value="{{ kunci.mata_pelajaran.nama }}" readonly
-             style="opacity:0.6;cursor:not-allowed;"/>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Nomor Soal</label>
-      <input type="text" class="form-control" value="Soal {{ kunci.nomor_soal }}" readonly
-             style="opacity:0.6;cursor:not-allowed;"/>
-    </div>
-    <div class="form-group">
-      <label class="form-label" for="jawaban_benar">Jawaban Benar</label>
-      <select id="jawaban_benar" name="jawaban_benar" class="form-select" required>
-        {% for o in opsi %}
-        <option value="{{ o }}" {% if o == kunci.jawaban_benar %}selected{% endif %}>{{ o }}</option>
-        {% endfor %}
-      </select>
-    </div>
-    <div class="flex gap-3 mt-2">
-      <button type="submit" class="btn btn-primary" id="btn-update-kunci">
-        <i class="fa-solid fa-floppy-disk"></i> Perbarui
-      </button>
-      <a href="{{ url_for('kunci.index', mapel_id=kunci.mapel_id) }}" class="btn btn-outline">
-        <i class="fa-solid fa-arrow-left"></i> Batal
-      </a>
-    </div>
-  </form>
 </div>
 {% endblock %}

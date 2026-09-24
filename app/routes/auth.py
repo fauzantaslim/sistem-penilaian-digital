@@ -20,7 +20,7 @@ def login():
         if user and user.check_password(password):
             login_user(user, remember=remember)
             next_page = request.args.get('next')
-            flash(f'Selamat datang, {user.username}!', 'success')
+            flash(f'Selamat datang, {user.nama_lengkap or user.username}!', 'success')
             return redirect(next_page or url_for('dashboard.index'))
         else:
             flash('Email atau password salah. Silakan coba lagi.', 'danger')
@@ -35,12 +35,13 @@ def register():
 
     if request.method == 'POST':
         username         = request.form.get('username', '').strip()
+        nama_lengkap     = request.form.get('nama_lengkap', '').strip()
         email            = request.form.get('email', '').strip()
         password         = request.form.get('password', '')
         confirm_password = request.form.get('confirm_password', '')
 
         # Validasi
-        if not username or not email or not password:
+        if not username or not email or not password or not nama_lengkap:
             flash('Semua field wajib diisi.', 'danger')
             return render_template('auth/register.html', title='Daftar')
 
@@ -56,7 +57,7 @@ def register():
             flash('Username sudah digunakan. Pilih username lain.', 'warning')
             return render_template('auth/register.html', title='Daftar')
 
-        user = User(username=username, email=email)
+        user = User(username=username, email=email, nama_lengkap=nama_lengkap or None)
         user.set_password(password)
         db.session.add(user)
         db.session.commit()

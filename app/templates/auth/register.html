@@ -8,124 +8,181 @@
   
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..800;1,9..40,400..800&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
   
-  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
   <script>
     tailwind.config = {
       theme: {
         extend: {
-          fontFamily: { sans: ['Inter', 'sans-serif'] },
+          fontFamily: { 
+            sans: ['"DM Sans"', 'sans-serif'],
+            display: ['Outfit', 'sans-serif']
+          },
           colors: {
-            primary: '#7acbaf',
-            'primary-dark': '#65b59a',
+            primary: { DEFAULT: '#7acbaf', dark: '#65b59a', light: '#e8f7f2' }
+          },
+          animation: {
+            'float-slow': 'floatSlow 10s ease-in-out infinite',
+            'float-fast': 'floatFast 8s ease-in-out infinite',
+            'fade-in-up': 'fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards'
+          },
+          keyframes: {
+            floatSlow: {
+              '0%, 100%': { transform: 'translate(0, 0) rotate(0deg) scale(1)' },
+              '50%': { transform: 'translate(20px, -20px) rotate(5deg) scale(1.05)' },
+            },
+            floatFast: {
+              '0%, 100%': { transform: 'translate(0, 0) rotate(0deg) scale(1)' },
+              '50%': { transform: 'translate(-20px, 20px) rotate(-5deg) scale(0.95)' },
+            },
+            fadeInUp: {
+              '0%': { opacity: '0', transform: 'translateY(30px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' }
+            }
           }
         }
       }
     }
   </script>
+  <style>
+    body::before {
+      content: ""; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 9999;
+    }
+    .input-soft {
+      background: rgba(255,255,255,0.7);
+      border: 1px solid rgba(0,0,0,0.05);
+      border-radius: 16px;
+      transition: all 0.3s ease;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+    }
+    .input-soft:focus {
+      background: #fff;
+      border-color: rgba(122, 203, 175, 0.5);
+      box-shadow: 0 4px 12px rgba(122, 203, 175, 0.1);
+      outline: none;
+    }
+    .glass-panel {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.8);
+      box-shadow: 0 24px 60px -10px rgba(0,0,0,0.05);
+    }
+  </style>
 </head>
-<body class="bg-gray-50 text-gray-800 font-sans antialiased min-h-screen flex items-center justify-center p-4 relative">
+<body class="bg-[#f4f7f6] text-gray-800 font-sans antialiased min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
 
-  <!-- Floating Shapes -->
-  <div class="absolute top-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-primary/20 blur-3xl pointer-events-none"></div>
-  <div class="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-blue-300/20 blur-3xl pointer-events-none"></div>
+  <!-- Dynamic Fluid Shapes -->
+  <div class="absolute top-[-10%] right-[-5%] w-[50vw] h-[50vw] rounded-full bg-primary/20 blur-[80px] pointer-events-none animate-float-slow"></div>
+  <div class="absolute bottom-[-15%] left-[-10%] w-[60vw] h-[60vw] rounded-full bg-blue-200/30 blur-[100px] pointer-events-none animate-float-fast"></div>
 
   <!-- Flash Messages -->
-  <div class="fixed top-4 right-4 z-50 flex flex-col gap-2" id="flash-container">
+  <div class="fixed top-6 right-6 z-50 flex flex-col gap-3" id="flash-container">
     {% with messages = get_flashed_messages(with_categories=true) %}
       {% for category, message in messages %}
-        <div class="flex items-center p-4 mb-4 text-sm rounded-lg shadow-sm border 
-          {% if category == 'success' %}text-green-800 border-green-300 bg-green-50
-          {% elif category == 'danger' %}text-red-800 border-red-300 bg-red-50
-          {% elif category == 'warning' %}text-orange-800 border-orange-300 bg-orange-50
-          {% else %}text-blue-800 border-blue-300 bg-blue-50{% endif %}" role="alert">
-          <i class="fa-solid mr-3
-            {% if category == 'success' %}fa-circle-check
-            {% elif category == 'danger' %}fa-circle-xmark
-            {% elif category == 'warning' %}fa-triangle-exclamation
-            {% else %}fa-circle-info{% endif %}"></i>
+        <div class="flex items-center px-5 py-4 text-sm font-medium rounded-2xl shadow-lg border border-white/50 backdrop-blur-md
+          {% if category == 'success' %}text-green-800 bg-green-50/90
+          {% elif category == 'danger' %}text-red-800 bg-red-50/90
+          {% elif category == 'warning' %}text-orange-800 bg-orange-50/90
+          {% else %}text-blue-800 bg-blue-50/90{% endif %}" role="alert">
+          <i class="ph-fill mr-3 text-xl
+            {% if category == 'success' %}ph-check-circle
+            {% elif category == 'danger' %}ph-x-circle
+            {% elif category == 'warning' %}ph-warning-circle
+            {% else %}ph-info{% endif %}"></i>
           <div>{{ message }}</div>
-          <button class="ml-auto -mx-1.5 -my-1.5 rounded-lg focus:ring-2 p-1.5 inline-flex h-8 w-8 hover:bg-black/5" onclick="this.parentElement.remove()" aria-label="Tutup">&times;</button>
+          <button class="ml-4 opacity-50 hover:opacity-100 text-lg" onclick="this.parentElement.remove()" aria-label="Tutup">&times;</button>
         </div>
       {% endfor %}
     {% endwith %}
   </div>
 
-  <div class="bg-white border border-gray-200 rounded-2xl shadow-xl w-full max-w-md p-8 relative z-10">
+  <div class="glass-panel rounded-[32px] w-full max-w-[440px] p-10 relative z-10 animate-fade-in-up">
     <div class="text-center mb-8">
-      <div class="text-5xl mb-4">✨</div>
-      <h1 class="text-2xl font-bold text-gray-900">Buat Akun Guru</h1>
-      <p class="text-sm text-gray-500 mt-2">Daftar untuk mengakses Sistem Penilaian Digital</p>
+      <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 text-primary text-3xl mb-4">
+        <i class="ph-fill ph-chalkboard-teacher"></i>
+      </div>
+      <h1 class="font-display text-3xl font-bold text-gray-900 tracking-tight">Buat Akun</h1>
+      <p class="text-gray-500 mt-2 font-medium">Daftar untuk mengakses sistem</p>
     </div>
 
     <form method="POST" action="{{ url_for('auth.register') }}" novalidate>
-      {{ form.hidden_tag() }}
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
       
       <div class="mb-4">
-        <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Username</label>
-        <div class="relative">
-          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <i class="fa-solid fa-user text-gray-400 text-sm"></i>
+        <label for="nama_lengkap" class="block text-sm font-semibold text-gray-600 mb-1.5 ml-1">Nama Lengkap</label>
+        <div class="relative group">
+          <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+            <i class="ph ph-identification-card text-gray-400 text-lg group-focus-within:text-primary transition-colors"></i>
           </div>
-          {{ form.username(class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-sm", placeholder="Pilih username", autofocus=True) }}
+          <input type="text" id="nama_lengkap" name="nama_lengkap" required
+            class="input-soft w-full pl-11 pr-4 py-3 text-sm"
+            placeholder="Masukkan nama lengkap Anda" autofocus/>
         </div>
-        {% for error in form.username.errors %}
-          <span class="text-xs text-red-500 mt-1 block">{{ error }}</span>
-        {% endfor %}
       </div>
 
       <div class="mb-4">
-        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Alamat Email</label>
-        <div class="relative">
-          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <i class="fa-solid fa-envelope text-gray-400 text-sm"></i>
+        <label for="username" class="block text-sm font-semibold text-gray-600 mb-1.5 ml-1">Username</label>
+        <div class="relative group">
+          <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+            <i class="ph ph-user text-gray-400 text-lg group-focus-within:text-primary transition-colors"></i>
           </div>
-          {{ form.email(class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-sm", placeholder="nama@sekolah.com") }}
+          <input type="text" id="username" name="username" required
+            class="input-soft w-full pl-11 pr-4 py-3 text-sm"
+            placeholder="Pilih username unik"/>
         </div>
-        {% for error in form.email.errors %}
-          <span class="text-xs text-red-500 mt-1 block">{{ error }}</span>
-        {% endfor %}
       </div>
 
       <div class="mb-4">
-        <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
-        <div class="relative">
-          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <i class="fa-solid fa-lock text-gray-400 text-sm"></i>
+        <label for="email" class="block text-sm font-semibold text-gray-600 mb-1.5 ml-1">Alamat Email</label>
+        <div class="relative group">
+          <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+            <i class="ph ph-envelope-simple text-gray-400 text-lg group-focus-within:text-primary transition-colors"></i>
           </div>
-          {{ form.password(class="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-sm", placeholder="Minimal 6 karakter", id="password-input") }}
-          <button type="button" id="toggle-password" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none" aria-label="Toggle password visibility">
-            <i class="fa-regular fa-eye" id="toggle-icon"></i>
+          <input type="email" id="email" name="email" required
+            class="input-soft w-full pl-11 pr-4 py-3 text-sm"
+            placeholder="nama@sekolah.com"/>
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <label for="password" class="block text-sm font-semibold text-gray-600 mb-1.5 ml-1">Password</label>
+        <div class="relative group">
+          <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+            <i class="ph ph-lock-key text-gray-400 text-lg group-focus-within:text-primary transition-colors"></i>
+          </div>
+          <input type="password" name="password" id="password-input" required
+            class="input-soft w-full pl-11 pr-12 py-3 text-sm"
+            placeholder="Minimal 6 karakter"/>
+          <button type="button" id="toggle-password" class="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none" aria-label="Toggle password visibility">
+            <i class="ph ph-eye text-lg" id="toggle-icon"></i>
           </button>
         </div>
-        {% for error in form.password.errors %}
-          <span class="text-xs text-red-500 mt-1 block">{{ error }}</span>
-        {% endfor %}
       </div>
 
       <div class="mb-6">
-        <label for="confirm_password" class="block text-sm font-medium text-gray-700 mb-1">Konfirmasi Password</label>
-        <div class="relative">
-          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <i class="fa-solid fa-lock text-gray-400 text-sm"></i>
+        <label for="confirm_password" class="block text-sm font-semibold text-gray-600 mb-1.5 ml-1">Konfirmasi Password</label>
+        <div class="relative group">
+          <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+            <i class="ph ph-lock-key-fill text-gray-400 text-lg group-focus-within:text-primary transition-colors"></i>
           </div>
-          {{ form.confirm_password(class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-sm", placeholder="Ketik ulang password") }}
+          <input type="password" id="confirm_password" name="confirm_password" required
+            class="input-soft w-full pl-11 pr-4 py-3 text-sm"
+            placeholder="Ketik ulang password"/>
         </div>
-        {% for error in form.confirm_password.errors %}
-          <span class="text-xs text-red-500 mt-1 block">{{ error }}</span>
-        {% endfor %}
       </div>
 
-      <button type="submit" class="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors">
-        Daftar Sekarang <i class="fa-solid fa-user-plus ml-2"></i>
+      <button type="submit" class="w-full flex justify-center items-center gap-2 py-3.5 px-4 rounded-2xl shadow-[0_8px_20px_rgba(122,203,175,0.3)] text-sm font-bold text-white bg-primary hover:bg-primary-dark hover:-translate-y-1 transition-all duration-300">
+        Daftar Sekarang <i class="ph-bold ph-user-plus"></i>
       </button>
     </form>
 
-    <div class="mt-8 text-center text-sm text-gray-500">
+    <div class="mt-6 text-center text-sm font-medium text-gray-500">
       Sudah punya akun? 
-      <a href="{{ url_for('auth.login') }}" class="font-medium text-primary hover:text-primary-dark transition-colors">Masuk di sini</a>
+      <a href="{{ url_for('auth.login') }}" class="text-primary hover:text-primary-dark transition-colors">Masuk di sini</a>
     </div>
   </div>
 
@@ -139,7 +196,7 @@
       toggleBtn.addEventListener('click', () => {
         const type = pwdInput.getAttribute('type') === 'password' ? 'text' : 'password';
         pwdInput.setAttribute('type', type);
-        toggleIcon.className = type === 'password' ? 'fa-regular fa-eye' : 'fa-regular fa-eye-slash';
+        toggleIcon.className = type === 'password' ? 'ph ph-eye' : 'ph ph-eye-slash';
       });
     }
   </script>

@@ -7,8 +7,11 @@
   
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+  <!-- Outfit for Headings, DM Sans for Body -->
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..800;1,9..40,400..800&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Phosphor Icons -->
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
   
   <!-- Tailwind CDN -->
   <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
@@ -16,30 +19,290 @@
     tailwind.config = {
       theme: {
         extend: {
-          fontFamily: { sans: ['Inter', 'ui-sans-serif', 'system-ui'] },
+          fontFamily: { 
+            sans: ['"DM Sans"', 'sans-serif'],
+            display: ['Outfit', 'sans-serif']
+          },
           colors: {
             primary: { DEFAULT: '#7acbaf', dark: '#65b59a', light: '#e8f7f2' }
+          },
+          animation: {
+            'stagger-up': 'staggerUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both',
+            'fade-in': 'fadeIn 0.4s ease-out both'
+          },
+          keyframes: {
+            staggerUp: {
+              '0%': { opacity: '0', transform: 'translateY(20px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' }
+            },
+            fadeIn: {
+              '0%': { opacity: '0' },
+              '100%': { opacity: '1' }
+            }
           }
         }
       }
     }
   </script>
 
-  <!-- Component CSS (non-@apply, works with CDN) -->
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"/>
+  <style>
+    /* Grain Overlay */
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9999;
+    }
+    
+    body {
+      background: #f4f7f6;
+      font-family: 'DM Sans', sans-serif;
+      color: #1a202c;
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    h1, h2, h3, h4, h5, h6, .brand-name, .nav-item, .font-display {
+      font-family: 'Outfit', sans-serif;
+    }
+
+    /* Floating Sidebar */
+    .floating-sidebar {
+      width: 260px;
+      margin: 16px;
+      margin-right: 0;
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 10px 40px -10px rgba(0,0,0,0.05);
+      display: flex;
+      flex-direction: column;
+      border: 1px solid rgba(255,255,255,0.6);
+      transition: all 0.3s ease;
+      overflow: hidden;
+    }
+    .sidebar-brand {
+      padding: 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid rgba(0,0,0,0.03);
+    }
+    .brand-icon {
+      font-size: 28px;
+      line-height: 1;
+    }
+    .brand-name {
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: #1a202c;
+      letter-spacing: -0.02em;
+    }
+    .brand-sub {
+      font-size: 0.75rem;
+      color: #718096;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .sidebar-nav {
+      flex: 1;
+      padding: 20px 12px;
+      overflow-y: auto;
+    }
+    .nav-section-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #a0aec0;
+      margin: 0 12px 8px;
+      font-weight: 600;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      border-radius: 12px;
+      color: #4a5568;
+      font-weight: 500;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      margin-bottom: 4px;
+    }
+    .nav-item:hover {
+      background: rgba(122, 203, 175, 0.1);
+      color: #7acbaf;
+      transform: translateX(4px);
+    }
+    .nav-item.active {
+      background: #7acbaf;
+      color: white;
+      box-shadow: 0 4px 12px rgba(122, 203, 175, 0.3);
+    }
+    .nav-icon {
+      font-size: 20px;
+    }
+    .sidebar-footer {
+      padding: 16px;
+      border-top: 1px solid rgba(0,0,0,0.03);
+    }
+    .nav-logout {
+      color: #e53e3e;
+    }
+    .nav-logout:hover {
+      background: rgba(229, 62, 62, 0.1);
+      color: #c53030;
+      transform: translateX(4px);
+    }
+
+    /* Topbar */
+    .topbar {
+      height: 72px;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px);
+      margin: 16px 32px 0;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      box-shadow: 0 4px 20px -10px rgba(0,0,0,0.05);
+    }
+    .topbar-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.35rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    .topbar-user {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: white;
+      padding: 6px 16px 6px 6px;
+      border-radius: 30px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+      border: 1px solid rgba(0,0,0,0.02);
+    }
+    .user-avatar-circle {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #7acbaf;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-family: 'Outfit', sans-serif;
+    }
+    .topbar-username {
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    /* Stagger Animation Utility classes */
+    .animate-in-1 { animation-delay: 0.1s; }
+    .animate-in-2 { animation-delay: 0.2s; }
+    .animate-in-3 { animation-delay: 0.3s; }
+    .animate-in-4 { animation-delay: 0.4s; }
+
+    /* Flash Message */
+    .flash-alert {
+      padding: 16px 20px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.9);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 10px 30px -10px rgba(0,0,0,0.1);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      border-left: 4px solid transparent;
+      animation: fadeIn 0.4s ease-out forwards;
+    }
+    .flash-success { border-left-color: #48bb78; color: #2f855a; }
+    .flash-danger { border-left-color: #e53e3e; color: #c53030; }
+    .flash-warning { border-left-color: #ed8936; color: #c05621; }
+    .flash-info { border-left-color: #4299e1; color: #2b6cb0; }
+    
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 20px;
+      border-radius: 12px;
+      font-weight: 600;
+      font-family: 'Outfit', sans-serif;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .btn-primary {
+      background: #7acbaf;
+      color: white;
+      box-shadow: 0 4px 14px rgba(122, 203, 175, 0.4);
+    }
+    .btn-primary:hover {
+      background: #65b59a;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(122, 203, 175, 0.5);
+    }
+    .btn-outline {
+      background: rgba(255,255,255,0.8);
+      color: #4a5568;
+      border: 1px solid rgba(0,0,0,0.1);
+    }
+    .btn-outline:hover {
+      background: white;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      border-color: rgba(0,0,0,0.15);
+      transform: translateY(-2px);
+    }
+    .btn-sm { padding: 6px 12px; font-size: 0.85rem; border-radius: 8px;}
+    
+    /* Cards */
+    .card {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px);
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,0.6);
+      box-shadow: 0 10px 40px -10px rgba(0,0,0,0.04);
+      overflow: hidden;
+    }
+    
+    /* Modal Overlay */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(20,30,40,0.4); backdrop-filter: blur(4px);
+      display: none; align-items: center; justify-content: center; z-index: 10000;
+      animation: fadeIn 0.3s ease;
+    }
+    .modal-box {
+      background: white; padding: 32px; border-radius: 24px; width: 90%; max-width: 400px;
+      text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+      transform: translateY(20px); animation: staggerUp 0.4s ease forwards;
+    }
+  </style>
 
   {% block head %}{% endblock %}
 </head>
-<body style="background:#f9fafb;font-family:'Inter',ui-sans-serif,system-ui;color:#1f2937;display:flex;height:100vh;overflow:hidden;">
+<body>
 
 <!-- Flash Messages -->
-<div style="position:fixed;top:16px;right:16px;z-index:9999;display:flex;flex-direction:column;gap:8px;max-width:380px;" id="flash-container">
+<div style="position:fixed;top:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:12px;max-width:380px;" id="flash-container">
   {% with messages = get_flashed_messages(with_categories=true) %}
     {% for category, message in messages %}
       <div class="flash-alert flash-{{ category }}" role="alert">
-        <i class="fa-solid {% if category == 'success' %}fa-circle-check{% elif category == 'danger' %}fa-circle-xmark{% elif category == 'warning' %}fa-triangle-exclamation{% else %}fa-circle-info{% endif %}"></i>
+        <i class="ph-fill {% if category == 'success' %}ph-check-circle{% elif category == 'danger' %}ph-x-circle{% elif category == 'warning' %}ph-warning-circle{% else %}ph-info{% endif %} text-xl"></i>
         <span>{{ message }}</span>
-        <button onclick="this.parentElement.remove()" aria-label="Tutup" style="margin-left:auto;background:none;border:none;cursor:pointer;font-size:16px;opacity:0.6;line-height:1;">&times;</button>
+        <button onclick="this.parentElement.remove()" aria-label="Tutup" style="margin-left:auto;background:none;border:none;cursor:pointer;font-size:20px;opacity:0.4;line-height:1;">&times;</button>
       </div>
     {% endfor %}
   {% endwith %}
@@ -47,71 +310,71 @@
 
 <!-- SIDEBAR -->
 {% if current_user.is_authenticated %}
-<aside class="sidebar" id="sidebar">
+<aside class="floating-sidebar animate-stagger-up animate-in-1" id="sidebar">
   <div class="sidebar-brand">
     <div class="brand-icon">🎓</div>
     <div class="brand-text">
-      <div class="brand-name">Sistem Penilaian</div>
-      <div class="brand-sub">Digital Assessment</div>
+      <div class="brand-name">DigiAssess</div>
+      <div class="brand-sub">Sistem Penilaian</div>
     </div>
   </div>
 
   <nav class="sidebar-nav">
     <div class="nav-section-label">Menu Utama</div>
     <a href="{{ url_for('dashboard.index') }}" class="nav-item {% if request.endpoint == 'dashboard.index' %}active{% endif %}" id="nav-dashboard">
-      <i class="fa-solid fa-chart-pie nav-icon"></i> Dashboard
+      <i class="ph-fill ph-squares-four nav-icon"></i> Dashboard
     </a>
 
-    <div class="nav-section-label" style="margin-top:16px;">Kelola Data</div>
+    <div class="nav-section-label" style="margin-top:24px;">Kelola Data</div>
     <a href="{{ url_for('siswa.index') }}" class="nav-item {% if request.blueprint == 'siswa' %}active{% endif %}" id="nav-siswa">
-      <i class="fa-solid fa-users nav-icon"></i> Data Siswa
+      <i class="ph-fill ph-users nav-icon"></i> Data Siswa
     </a>
     <a href="{{ url_for('mapel.index') }}" class="nav-item {% if request.blueprint == 'mapel' %}active{% endif %}" id="nav-mapel">
-      <i class="fa-solid fa-book-open nav-icon"></i> Mata Pelajaran
+      <i class="ph-fill ph-books nav-icon"></i> Mata Pelajaran
     </a>
     <a href="{{ url_for('kunci.index') }}" class="nav-item {% if request.blueprint == 'kunci' %}active{% endif %}" id="nav-kunci">
-      <i class="fa-solid fa-key nav-icon"></i> Kunci Jawaban
+      <i class="ph-fill ph-key nav-icon"></i> Kunci Jawaban
     </a>
 
-    <div class="nav-section-label" style="margin-top:16px;">Penilaian</div>
+    <div class="nav-section-label" style="margin-top:24px;">Penilaian</div>
     <a href="{{ url_for('upload.index') }}" class="nav-item {% if request.blueprint == 'upload' %}active{% endif %}" id="nav-upload">
-      <i class="fa-solid fa-cloud-arrow-up nav-icon"></i> Upload Lembar
+      <i class="ph-fill ph-cloud-arrow-up nav-icon"></i> Upload Lembar
     </a>
     <a href="{{ url_for('laporan.index') }}" class="nav-item {% if request.blueprint == 'laporan' %}active{% endif %}" id="nav-laporan">
-      <i class="fa-solid fa-chart-bar nav-icon"></i> Laporan Penilaian
+      <i class="ph-fill ph-chart-bar nav-icon"></i> Laporan
     </a>
   </nav>
 
   <div class="sidebar-footer">
     <a href="{{ url_for('auth.logout') }}" class="nav-item nav-logout" id="nav-logout">
-      <i class="fa-solid fa-right-from-bracket nav-icon"></i> Logout
+      <i class="ph-fill ph-sign-out nav-icon"></i> Logout
     </a>
   </div>
 </aside>
 {% endif %}
 
 <!-- MAIN LAYOUT -->
-<div style="flex:1;display:flex;flex-direction:column;height:100vh;overflow:hidden;">
+<div style="flex:1;display:flex;flex-direction:column;height:100vh;overflow:hidden;position:relative;z-index:1;">
 
   {% if current_user.is_authenticated %}
   <!-- TOPBAR -->
-  <header class="topbar">
+  <header class="topbar animate-fade-in">
     <div style="display:flex;align-items:center;gap:16px;">
-      <button id="menu-toggle" class="menu-toggle-btn" aria-label="Toggle menu">
-        <i class="fa-solid fa-bars"></i>
+      <button id="menu-toggle" class="btn btn-outline" style="padding:10px;border-radius:12px;border:none;background:rgba(255,255,255,0.8);backdrop-filter:blur(10px);box-shadow:0 2px 8px rgba(0,0,0,0.03);" aria-label="Toggle menu">
+        <i class="ph ph-list text-xl"></i>
       </button>
       <span class="topbar-title">{% block page_title %}{{ title or 'Dashboard' }}{% endblock %}</span>
     </div>
     <div class="topbar-user">
       <div class="user-avatar-circle">{{ current_user.username[0]|upper }}</div>
-      <span class="topbar-username">{{ current_user.username }}</span>
+      <span class="topbar-username">{{ current_user.nama_lengkap or current_user.username }}</span>
     </div>
   </header>
   {% endif %}
 
   <!-- CONTENT -->
-  <main style="flex:1;overflow-y:auto;padding:32px;" id="main-content">
-    <div style="max-width:1100px;margin:0 auto;">
+  <main style="flex:1;overflow-y:auto;padding:24px 32px;" id="main-content" class="animate-stagger-up animate-in-2">
+    <div style="width:100%;padding-bottom:60px;">
       {% block content %}{% endblock %}
     </div>
   </main>
@@ -120,21 +383,55 @@
 <!-- Modal Konfirmasi Hapus -->
 <div class="modal-overlay" id="confirm-modal" role="dialog" aria-modal="true">
   <div class="modal-box">
-    <div class="modal-icon-wrap">
-      <i class="fa-solid fa-trash"></i>
+    <div style="width:64px;height:64px;border-radius:50%;background:#fee2e2;color:#ef4444;display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 16px;">
+      <i class="ph-fill ph-trash"></i>
     </div>
-    <h3 class="modal-title" id="modal-title">Konfirmasi Hapus</h3>
-    <p class="modal-desc" id="modal-message">Apakah Anda yakin ingin menghapus item ini?</p>
-    <form method="POST" id="confirm-form" style="display:flex;gap:12px;margin-top:24px;">
+    <h3 class="font-display font-bold text-xl text-gray-900 mb-2" id="modal-title">Konfirmasi Hapus</h3>
+    <p class="text-gray-500 text-sm mb-6" id="modal-message">Apakah Anda yakin ingin menghapus item ini? Tindakan ini tidak dapat dibatalkan.</p>
+    <form method="POST" id="confirm-form" style="display:flex;gap:12px;">
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-      <button type="button" class="btn btn-outline" id="modal-cancel" style="flex:1;">Batal</button>
-      <button type="submit" class="btn btn-danger" style="flex:1;">Hapus</button>
+      <button type="button" class="btn btn-outline" id="modal-cancel" style="flex:1;border-color:transparent;background:#f1f5f9;">Batal</button>
+      <button type="submit" class="btn" style="flex:1;background:#ef4444;color:white;box-shadow:none;">Hapus</button>
     </form>
   </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
-<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+<script>
+  // Simple menu toggle script
+  const menuToggle = document.getElementById('menu-toggle');
+  const sidebar = document.getElementById('sidebar');
+  if(menuToggle && sidebar) {
+    menuToggle.addEventListener('click', () => {
+      if(sidebar.style.display === 'none' || sidebar.style.display === '') {
+        sidebar.style.display = 'flex';
+        sidebar.style.animation = 'fadeIn 0.3s ease forwards';
+      } else {
+        sidebar.style.display = 'none';
+      }
+    });
+  }
+  
+  // Modal scripts
+  const modal = document.getElementById('confirm-modal');
+  const cancelBtn = document.getElementById('modal-cancel');
+  if(cancelBtn) {
+    cancelBtn.addEventListener('click', () => {
+      modal.style.display = 'none';
+    });
+  }
+  
+  window.showConfirmModal = function(url, message, title) {
+    const form = document.getElementById('confirm-form');
+    const msgEl = document.getElementById('modal-message');
+    const titleEl = document.getElementById('modal-title');
+    
+    if(form) form.action = url;
+    if(msgEl && message) msgEl.textContent = message;
+    if(titleEl && title) titleEl.textContent = title;
+    if(modal) modal.style.display = 'flex';
+  }
+</script>
 {% block scripts %}{% endblock %}
 </body>
 </html>

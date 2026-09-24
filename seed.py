@@ -12,7 +12,8 @@ def seed_users():
             print("Membuat user admin...")
             new_admin = User(
                 username='admin',
-                email='admin@sekolah.com'
+                email='admin@sekolah.com',
+                nama_lengkap='Administrator'
             )
             new_admin.set_password('admin')
             db.session.add(new_admin)

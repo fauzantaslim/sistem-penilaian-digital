@@ -1,103 +1,140 @@
 {% extends 'base.html' %}
 {% block title %}Laporan Penilaian{% endblock %}
+{% block page_title %}Laporan{% endblock %}
 
 {% block content %}
-<div class="page-header">
-  <h1>Laporan Penilaian</h1>
-  <div class="breadcrumb">Penilaian › <span>Laporan</span></div>
+<div class="mb-10 animate-fade-in flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
+  <div>
+    <h1 class="font-display text-4xl font-bold text-gray-900 tracking-tight mb-2">Laporan Penilaian</h1>
+    <div class="text-gray-500 font-medium text-lg flex items-center gap-2">
+      <span>Penilaian</span>
+      <i class="ph-bold ph-caret-right text-sm"></i>
+      <span class="text-gray-800">Laporan</span>
+    </div>
+  </div>
+  <a href="{{ url_for('laporan.export_excel', mapel_id=selected_mapel or '', kelas=selected_kelas or '') }}"
+     class="btn bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-500/20 shrink-0">
+    <i class="ph-bold ph-microsoft-excel-logo text-lg"></i> Export Excel
+  </a>
 </div>
 
-<!-- Filter -->
-<div class="card mb-3">
-  <form method="GET" action="{{ url_for('laporan.index') }}" class="flex gap-3 flex-wrap" id="filter-laporan">
-    <div class="form-group mb-0" style="flex:1;min-width:180px;">
-      <label class="form-label" for="mapel_id">Mata Pelajaran</label>
-      <select name="mapel_id" id="mapel-filter" class="form-select">
-        <option value="">Semua Mata Pelajaran</option>
-        {% for m in mapel_list %}
-        <option value="{{ m.id }}" {% if selected_mapel == m.id %}selected{% endif %}>[{{ m.kode }}] {{ m.nama }}</option>
-        {% endfor %}
-      </select>
+<!-- Filter Bar -->
+<div class="card p-5 mb-8 animate-fade-in animate-in-1">
+  <form method="GET" action="{{ url_for('laporan.index') }}" class="flex flex-col sm:flex-row gap-4 items-end w-full">
+    <div class="flex-1 min-w-0">
+      <label class="block text-sm font-semibold text-gray-600 mb-2 ml-1" for="mapel-filter">Mata Pelajaran</label>
+      <div class="relative group">
+        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+          <i class="ph ph-books text-gray-400 text-lg group-focus-within:text-primary transition-colors"></i>
+        </div>
+        <select name="mapel_id" id="mapel-filter"
+          class="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-100 rounded-xl focus:bg-white focus:ring-2 focus:ring-primary focus:border-primary transition-all text-sm appearance-none">
+          <option value="">Semua Mata Pelajaran</option>
+          {% for m in mapel_list %}
+          <option value="{{ m.id }}" {% if selected_mapel == m.id %}selected{% endif %}>[{{ m.kode }}] {{ m.nama }}</option>
+          {% endfor %}
+        </select>
+        <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
+          <i class="ph ph-caret-down text-gray-400 text-sm"></i>
+        </div>
+      </div>
     </div>
-    <div class="form-group mb-0" style="min-width:140px;">
-      <label class="form-label" for="kelas">Kelas</label>
-      <select name="kelas" id="kelas-filter" class="form-select">
-        <option value="">Semua Kelas</option>
-        {% for k in kelas_list %}
-        <option value="{{ k }}" {% if selected_kelas == k %}selected{% endif %}>{{ k }}</option>
-        {% endfor %}
-      </select>
+    <div style="min-width:160px;">
+      <label class="block text-sm font-semibold text-gray-600 mb-2 ml-1" for="kelas-filter">Kelas</label>
+      <div class="relative group">
+        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+          <i class="ph ph-chalkboard-teacher text-gray-400 text-lg group-focus-within:text-primary transition-colors"></i>
+        </div>
+        <select name="kelas" id="kelas-filter"
+          class="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-100 rounded-xl focus:bg-white focus:ring-2 focus:ring-primary focus:border-primary transition-all text-sm appearance-none">
+          <option value="">Semua Kelas</option>
+          {% for k in kelas_list %}
+          <option value="{{ k }}" {% if selected_kelas == k %}selected{% endif %}>{{ k }}</option>
+          {% endfor %}
+        </select>
+        <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
+          <i class="ph ph-caret-down text-gray-400 text-sm"></i>
+        </div>
+      </div>
     </div>
-    <div style="padding-top:22px;display:flex;gap:8px;">
-      <button type="submit" class="btn btn-primary" id="btn-filter-laporan">
-        <i class="fa-solid fa-filter"></i> Filter
+    <div class="flex gap-2 shrink-0">
+      <button type="submit" class="btn btn-primary px-6 py-3">
+        <i class="ph-bold ph-funnel"></i> Filter
       </button>
-      <a href="{{ url_for('laporan.index') }}" class="btn btn-outline">Reset</a>
+      <a href="{{ url_for('laporan.index') }}" class="btn bg-gray-100 text-gray-700 hover:bg-gray-200 border border-transparent px-5">Reset</a>
     </div>
   </form>
 </div>
 
-<div class="card">
-  <div class="card-header">
-    <span class="card-title">
-      <i class="fa-solid fa-chart-bar text-purple" style="margin-right:8px;"></i>
-      Hasil Penilaian
-      <span class="badge badge-purple" style="margin-left:8px;">{{ hasil_list.total }}</span>
-    </span>
-    <div class="flex gap-2">
-      <a href="{{ url_for('laporan.export_excel', mapel_id=selected_mapel or '', kelas=selected_kelas or '') }}"
-         class="btn btn-success btn-sm" id="btn-export-excel">
-        <i class="fa-solid fa-file-excel"></i> Export Excel
-      </a>
-    </div>
+<!-- Results Table -->
+<div class="card p-0 overflow-hidden animate-fade-in animate-in-2">
+  <div class="p-6 border-b border-gray-100 bg-white/50 flex justify-between items-center">
+    <h3 class="font-display text-xl font-bold text-gray-800 flex items-center gap-2">
+      <i class="ph-fill ph-chart-bar text-primary"></i> Hasil Penilaian
+    </h3>
+    <span class="bg-primary/10 text-primary font-bold px-3 py-1 rounded-full text-sm">{{ hasil_list.total }} data</span>
   </div>
 
   {% if hasil_list.items %}
-  <div class="table-wrapper">
-    <table>
+  <div class="overflow-x-auto">
+    <table class="w-full text-left border-collapse">
       <thead>
-        <tr>
-          <th>#</th>
-          <th>Nama Siswa</th>
-          <th>NIS</th>
-          <th>Kelas</th>
-          <th>Mata Pelajaran</th>
-          <th>Skor</th>
-          <th>Status</th>
-          <th>Tanggal</th>
-          <th>Aksi</th>
+        <tr class="bg-gray-50/50">
+          <th class="py-4 px-6 font-semibold text-xs text-gray-500 uppercase tracking-wider">#</th>
+          <th class="py-4 px-6 font-semibold text-xs text-gray-500 uppercase tracking-wider">Siswa</th>
+          <th class="py-4 px-6 font-semibold text-xs text-gray-500 uppercase tracking-wider">Mata Pelajaran</th>
+          <th class="py-4 px-6 font-semibold text-xs text-gray-500 uppercase tracking-wider text-center">Skor</th>
+          <th class="py-4 px-6 font-semibold text-xs text-gray-500 uppercase tracking-wider">Status</th>
+          <th class="py-4 px-6 font-semibold text-xs text-gray-500 uppercase tracking-wider">Tanggal</th>
+          <th class="py-4 px-6 font-semibold text-xs text-gray-500 uppercase tracking-wider text-right">Aksi</th>
         </tr>
       </thead>
-      <tbody>
+      <tbody class="divide-y divide-gray-100">
         {% for hasil in hasil_list.items %}
         {% set lembar = hasil.lembar_jawaban %}
         {% set siswa  = lembar.siswa %}
         {% set mapel  = lembar.mata_pelajaran %}
-        <tr>
-          <td class="text-muted">{{ loop.index + (hasil_list.page - 1) * hasil_list.per_page }}</td>
-          <td class="fw-bold">{{ siswa.nama }}</td>
-          <td class="text-sm" style="color:var(--accent-cyan);">{{ siswa.nis }}</td>
-          <td><span class="badge badge-purple">{{ siswa.kelas }}</span></td>
-          <td>
-            <span class="badge badge-cyan">{{ mapel.kode }}</span>
-            <span class="text-sm text-muted" style="margin-left:4px;">{{ mapel.nama }}</span>
+        <tr class="hover:bg-gray-50/80 transition-colors group">
+          <td class="py-4 px-6 text-sm text-gray-400 font-medium">
+            {{ loop.index + (hasil_list.page - 1) * hasil_list.per_page }}
           </td>
-          <td>
+          <td class="py-4 px-6">
+            <div class="font-bold text-gray-900">{{ siswa.nama }}</div>
+            <div class="flex items-center gap-2 mt-1">
+              <span class="text-xs text-gray-400 font-medium">{{ siswa.nis }}</span>
+              <span class="inline-flex items-center text-xs font-bold bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded">{{ siswa.kelas }}</span>
+            </div>
+          </td>
+          <td class="py-4 px-6">
+            <span class="text-xs font-bold bg-cyan-50 text-cyan-600 px-2 py-0.5 rounded mr-1.5">{{ mapel.kode }}</span>
+            <span class="text-sm text-gray-600 font-medium">{{ mapel.nama }}</span>
+          </td>
+          <td class="py-4 px-6 text-center">
             {% if hasil.skor is not none %}
-            <span class="fw-bold"
-              style="color:{% if hasil.skor >= 75 %}var(--accent-green){% elif hasil.skor >= 50 %}var(--accent-orange){% else %}var(--accent-red){% endif %}">
-              {{ hasil.skor }}
-            </span>
+              <div class="inline-flex items-center justify-center w-10 h-10 rounded-full font-bold text-sm
+                {% if hasil.skor >= 75 %}bg-emerald-100 text-emerald-700
+                {% elif hasil.skor >= 50 %}bg-amber-100 text-amber-700
+                {% else %}bg-red-100 text-red-700{% endif %}">
+                {{ hasil.skor }}
+              </div>
             {% else %}
-            <span class="text-muted">—</span>
+              <span class="text-gray-400">—</span>
             {% endif %}
           </td>
-          <td><span class="badge status-{{ lembar.status }}">{{ lembar.status|title }}</span></td>
-          <td class="text-sm text-muted">{{ hasil.created_at.strftime('%d %b %Y') }}</td>
-          <td>
-            <a href="{{ url_for('laporan.detail', id=hasil.id) }}" class="btn btn-outline btn-sm"
-               id="btn-detail-laporan-{{ hasil.id }}" title="Lihat Detail">
-              <i class="fa-solid fa-eye"></i>
+          <td class="py-4 px-6">
+            <span class="text-xs font-bold px-2.5 py-1 rounded-full
+              {% if lembar.status == 'done' %}bg-emerald-100 text-emerald-700
+              {% elif lembar.status == 'pending' %}bg-amber-100 text-amber-700
+              {% elif lembar.status == 'processing' %}bg-blue-100 text-blue-700
+              {% else %}bg-red-100 text-red-700{% endif %}">
+              {{ lembar.status|title }}
+            </span>
+          </td>
+          <td class="py-4 px-6 text-sm text-gray-500">{{ hasil.created_at.strftime('%d %b %Y') }}</td>
+          <td class="py-4 px-6 text-right">
+            <a href="{{ url_for('laporan.detail', id=hasil.id) }}"
+               class="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-gray-100 text-gray-600 hover:bg-primary hover:text-white transition-colors">
+              <i class="ph-bold ph-eye"></i>
             </a>
           </td>
         </tr>
@@ -108,24 +145,32 @@
 
   <!-- Pagination -->
   {% if hasil_list.pages > 1 %}
-  <div class="pagination">
-    {% for p in hasil_list.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
-      {% if p %}
-        <a href="{{ url_for('laporan.index', page=p, mapel_id=selected_mapel or '', kelas=selected_kelas or '') }}"
-           class="page-btn {% if p == hasil_list.page %}active{% endif %}">{{ p }}</a>
-      {% else %}
-        <span class="page-btn" style="pointer-events:none;">…</span>
-      {% endif %}
-    {% endfor %}
+  <div class="p-6 border-t border-gray-100 bg-gray-50/50 flex justify-center">
+    <div class="inline-flex bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+      {% for p in hasil_list.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+        {% if p %}
+          <a href="{{ url_for('laporan.index', page=p, mapel_id=selected_mapel or '', kelas=selected_kelas or '') }}"
+             class="px-4 py-2 text-sm font-medium border-r border-gray-200 hover:bg-gray-50 {% if p == hasil_list.page %}bg-primary text-white hover:bg-primary{% else %}text-gray-600{% endif %}">
+            {{ p }}
+          </a>
+        {% else %}
+          <span class="px-4 py-2 text-gray-400 border-r border-gray-200">…</span>
+        {% endif %}
+      {% endfor %}
+    </div>
   </div>
   {% endif %}
 
   {% else %}
-  <div class="empty-state">
-    <div class="empty-icon">📊</div>
-    <h3>Tidak Ada Data Laporan</h3>
-    <p>Belum ada hasil penilaian yang tersedia{% if selected_mapel or selected_kelas %} untuk filter yang dipilih{% endif %}.</p>
+  <div class="p-16 flex flex-col items-center justify-center text-center">
+    <div class="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center text-5xl text-gray-300 mb-6">
+      <i class="ph-fill ph-chart-bar"></i>
+    </div>
+    <h3 class="font-display text-xl font-bold text-gray-900 mb-2">Tidak Ada Data Laporan</h3>
+    <p class="text-gray-500 max-w-sm">Belum ada hasil penilaian{% if selected_mapel or selected_kelas %} untuk filter yang dipilih{% endif %}.</p>
   </div>
   {% endif %}
 </div>
 {% endblock %}
+
+
