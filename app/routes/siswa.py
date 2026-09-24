@@ -5,6 +5,12 @@ from app.models import Siswa
 
 siswa_bp = Blueprint('siswa', __name__, url_prefix='/siswa')
 
+KELAS_LIST = [
+    'VII A', 'VII B', 'VII C', 'VII D',
+    'VIII A', 'VIII B', 'VIII C', 'VIII D',
+    'IX A', 'IX B', 'IX C', 'IX D',
+]
+
 
 @siswa_bp.route('/')
 @login_required
@@ -34,11 +40,11 @@ def tambah():
 
         if not nama or not nis or not kelas:
             flash('Semua field wajib diisi.', 'danger')
-            return render_template('siswa/tambah.html', title='Tambah Siswa')
+            return render_template('siswa/tambah.html', title='Tambah Siswa', kelas_list=KELAS_LIST)
 
         if Siswa.query.filter_by(nis=nis).first():
             flash(f'NIS {nis} sudah terdaftar.', 'warning')
-            return render_template('siswa/tambah.html', title='Tambah Siswa')
+            return render_template('siswa/tambah.html', title='Tambah Siswa', kelas_list=KELAS_LIST)
 
         siswa = Siswa(nama=nama, nis=nis, kelas=kelas)
         db.session.add(siswa)
@@ -46,7 +52,7 @@ def tambah():
         flash(f'Siswa {nama} berhasil ditambahkan.', 'success')
         return redirect(url_for('siswa.index'))
 
-    return render_template('siswa/tambah.html', title='Tambah Siswa')
+    return render_template('siswa/tambah.html', title='Tambah Siswa', kelas_list=KELAS_LIST)
 
 
 @siswa_bp.route('/edit/<int:id>', methods=['GET', 'POST'])
@@ -61,12 +67,12 @@ def edit(id):
 
         if not nama or not nis or not kelas:
             flash('Semua field wajib diisi.', 'danger')
-            return render_template('siswa/edit.html', title='Edit Siswa', siswa=siswa)
+            return render_template('siswa/edit.html', title='Edit Siswa', siswa=siswa, kelas_list=KELAS_LIST)
 
         existing = Siswa.query.filter_by(nis=nis).first()
         if existing and existing.id != id:
             flash(f'NIS {nis} sudah digunakan siswa lain.', 'warning')
-            return render_template('siswa/edit.html', title='Edit Siswa', siswa=siswa)
+            return render_template('siswa/edit.html', title='Edit Siswa', siswa=siswa, kelas_list=KELAS_LIST)
 
         siswa.nama  = nama
         siswa.nis   = nis
@@ -75,7 +81,7 @@ def edit(id):
         flash(f'Data siswa {nama} berhasil diperbarui.', 'success')
         return redirect(url_for('siswa.index'))
 
-    return render_template('siswa/edit.html', title='Edit Siswa', siswa=siswa)
+    return render_template('siswa/edit.html', title='Edit Siswa', siswa=siswa, kelas_list=KELAS_LIST)
 
 
 @siswa_bp.route('/hapus/<int:id>', methods=['POST'])

@@ -55,9 +55,16 @@
             <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
               <i class="ph ph-chalkboard-teacher text-gray-400 text-lg group-focus-within:text-primary transition-colors"></i>
             </div>
-            <input type="text" id="kelas" name="kelas" required
-              class="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary transition-all text-sm placeholder-gray-400 shadow-sm"
-              placeholder="Contoh: X IPA 1"/>
+            <select id="kelas" name="kelas" required
+              class="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary transition-all text-sm shadow-sm appearance-none cursor-pointer">
+              <option value="">— Pilih Kelas —</option>
+              {% for k in kelas_list %}
+              <option value="{{ k }}">{{ k }}</option>
+              {% endfor %}
+            </select>
+            <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
+              <i class="ph ph-caret-down text-gray-400"></i>
+            </div>
           </div>
         </div>
       </div>

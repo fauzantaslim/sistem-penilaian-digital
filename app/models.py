@@ -80,7 +80,9 @@ class KunciJawaban(db.Model):
     id            = db.Column(db.Integer, primary_key=True)
     mapel_id      = db.Column(db.Integer, db.ForeignKey('mata_pelajaran.id'), nullable=False)
     nomor_soal    = db.Column(db.Integer, nullable=False)
-    jawaban_benar = db.Column(db.String(1), nullable=False)  # A, B, C, D, E
+    tipe          = db.Column(db.String(10), nullable=False, default='PG') # 'PG' atau 'ESSAY'
+    jawaban_benar = db.Column(db.Text, nullable=False)  # A, B, C, D, E atau teks rubrik
+    bobot         = db.Column(db.Float, nullable=False, default=1.0)
     created_at    = db.Column(db.DateTime, default=datetime.utcnow)
 
     __table_args__ = (

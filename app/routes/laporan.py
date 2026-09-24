@@ -4,6 +4,7 @@ from flask import Blueprint, render_template, request, send_file, flash, redirec
 from flask_login import login_required
 from app.models import HasilPenilaian, LembarJawaban, Siswa, MataPelajaran
 from app.extensions import db
+from app.routes.siswa import KELAS_LIST
 
 laporan_bp = Blueprint('laporan', __name__, url_prefix='/laporan')
 
@@ -16,7 +17,7 @@ def index():
     page       = request.args.get('page', 1, type=int)
 
     mapel_list  = MataPelajaran.query.order_by(MataPelajaran.nama).all()
-    kelas_list  = [row[0] for row in db.session.query(Siswa.kelas).distinct().order_by(Siswa.kelas).all()]
+    kelas_list  = KELAS_LIST
 
     query = (
         HasilPenilaian.query
