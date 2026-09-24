@@ -17,13 +17,11 @@ MAPEL_DATA = [
         'kode': 'MTK',
         'deskripsi': 'Mata Pelajaran Matematika Wajib',
         'kunci': [
-            {'tipe': 'PG', 'jawaban': 'A', 'bobot': 1.0},
-            {'tipe': 'PG', 'jawaban': 'B', 'bobot': 1.0},
-            {'tipe': 'PG', 'jawaban': 'C', 'bobot': 1.0},
-            {'tipe': 'PG', 'jawaban': 'D', 'bobot': 1.0},
-            {'tipe': 'PG', 'jawaban': 'E', 'bobot': 1.0},
-            {'tipe': 'ESSAY', 'jawaban': 'x = 5 dan y = 10', 'bobot': 5.0},
-            {'tipe': 'ESSAY', 'jawaban': 'Luas = 25 cm^2', 'bobot': 5.0}
+            {'jawaban': 'x = 5 dan y = 10 diperoleh dengan substitusi persamaan linear dua variabel', 'bobot': 4.0},
+            {'jawaban': 'Luas lingkaran adalah pi kali jari-jari kuadrat yaitu phi r pangkat dua', 'bobot': 4.0},
+            {'jawaban': 'Teorema Pythagoras menyatakan sisi miring kuadrat sama dengan jumlah kuadrat dua sisi lainnya', 'bobot': 4.0},
+            {'jawaban': 'Volume kubus adalah sisi pangkat tiga atau s kali s kali s', 'bobot': 4.0},
+            {'jawaban': 'FPB dicari menggunakan faktorisasi prima kemudian ambil faktor terkecil', 'bobot': 4.0},
         ]
     },
     {
@@ -31,13 +29,11 @@ MAPEL_DATA = [
         'kode': 'BIND',
         'deskripsi': 'Mata Pelajaran Bahasa Indonesia',
         'kunci': [
-            {'tipe': 'PG', 'jawaban': 'C', 'bobot': 1.0},
-            {'tipe': 'PG', 'jawaban': 'A', 'bobot': 1.0},
-            {'tipe': 'PG', 'jawaban': 'B', 'bobot': 1.0},
-            {'tipe': 'PG', 'jawaban': 'D', 'bobot': 1.0},
-            {'tipe': 'PG', 'jawaban': 'E', 'bobot': 1.0},
-            {'tipe': 'ESSAY', 'jawaban': 'Majas Personifikasi', 'bobot': 3.0},
-            {'tipe': 'ESSAY', 'jawaban': 'Kalimat Deduktif', 'bobot': 3.0}
+            {'jawaban': 'Majas personifikasi adalah gaya bahasa yang memberikan sifat manusia kepada benda mati', 'bobot': 4.0},
+            {'jawaban': 'Kalimat deduktif adalah kalimat yang gagasan utamanya terletak di awal paragraf', 'bobot': 4.0},
+            {'jawaban': 'Teks eksposisi bertujuan untuk memaparkan informasi secara objektif dan faktual kepada pembaca', 'bobot': 4.0},
+            {'jawaban': 'Sinonim adalah kata yang memiliki makna sama atau hampir sama dengan kata lain', 'bobot': 4.0},
+            {'jawaban': 'Paragraf argumentasi berisi pendapat yang disertai alasan dan bukti yang kuat', 'bobot': 4.0},
         ]
     },
     {
@@ -45,15 +41,13 @@ MAPEL_DATA = [
         'kode': 'IPA',
         'deskripsi': 'Mata Pelajaran Terpadu IPA',
         'kunci': [
-            {'tipe': 'PG', 'jawaban': 'B', 'bobot': 1.0},
-            {'tipe': 'PG', 'jawaban': 'D', 'bobot': 1.0},
-            {'tipe': 'PG', 'jawaban': 'A', 'bobot': 1.0},
-            {'tipe': 'PG', 'jawaban': 'C', 'bobot': 1.0},
-            {'tipe': 'PG', 'jawaban': 'E', 'bobot': 1.0},
-            {'tipe': 'ESSAY', 'jawaban': 'Fotosintesis menghasilkan Oksigen', 'bobot': 4.0},
-            {'tipe': 'ESSAY', 'jawaban': 'Gaya tarik bumi (Gravitasi)', 'bobot': 4.0}
+            {'jawaban': 'Fotosintesis adalah proses pembuatan makanan oleh tumbuhan menggunakan cahaya matahari menghasilkan oksigen', 'bobot': 4.0},
+            {'jawaban': 'Gaya tarik bumi disebut gravitasi yang menyebabkan benda jatuh ke bawah', 'bobot': 4.0},
+            {'jawaban': 'Sel adalah unit terkecil penyusun makhluk hidup yang terdiri atas membran sel inti sel dan sitoplasma', 'bobot': 4.0},
+            {'jawaban': 'Magnet memiliki dua kutub yaitu kutub utara dan kutub selatan yang saling tarik menarik bila berbeda', 'bobot': 4.0},
+            {'jawaban': 'Ekosistem terdiri dari komponen biotik dan abiotik yang saling berinteraksi membentuk keseimbangan', 'bobot': 4.0},
         ]
-    }
+    },
 ]
 
 # ─── Data Siswa ──────────────────────────────────────────
@@ -133,7 +127,6 @@ def seed_database():
                     KunciJawaban(
                         mapel_id=mapel.id, 
                         nomor_soal=i + 1, 
-                        tipe=k['tipe'],
                         jawaban_benar=k['jawaban'],
                         bobot=k['bobot']
                     )

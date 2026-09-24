@@ -24,6 +24,13 @@ app.db
 app/static/uploads/
 datasets/
 *.zip
+
+# ─── Training & Models ────────────────────
+training/checkpoints/
+*.pth
+*.pt
+*.onnx
+*.weights
 *.tar.gz
 
 # ─── Environment Variables ────────────────

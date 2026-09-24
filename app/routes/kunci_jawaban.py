@@ -1,20 +1,17 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request
+﻿from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_required
 from app.extensions import db
 from app.models import KunciJawaban, MataPelajaran
 
 kunci_bp = Blueprint('kunci', __name__, url_prefix='/kunci')
 
-OPSI_JAWABAN = ['A', 'B', 'C', 'D', 'E']
-
 
 @kunci_bp.route('/')
 @login_required
 def index():
-    mapel_id  = request.args.get('mapel_id', type=int)
+    mapel_id   = request.args.get('mapel_id', type=int)
     mapel_list = MataPelajaran.query.order_by(MataPelajaran.nama).all()
     kunci_list = []
-
     if mapel_id:
         kunci_list = (
             KunciJawaban.query
@@ -22,14 +19,12 @@ def index():
             .order_by(KunciJawaban.nomor_soal)
             .all()
         )
-
     return render_template(
         'kunci_jawaban/index.html',
         title='Kelola Kunci Jawaban',
         mapel_list=mapel_list,
         kunci_list=kunci_list,
         selected_mapel=mapel_id,
-        opsi=OPSI_JAWABAN
     )
 
 
@@ -37,48 +32,27 @@ def index():
 @login_required
 def tambah():
     mapel_list = MataPelajaran.query.order_by(MataPelajaran.nama).all()
-
     if request.method == 'POST':
         mapel_id      = request.form.get('mapel_id', type=int)
         nomor_soal    = request.form.get('nomor_soal', type=int)
-        tipe          = request.form.get('tipe', 'PG').strip().upper()
+        jawaban_benar = request.form.get('jawaban_benar', '').strip()
         bobot         = request.form.get('bobot', type=float, default=1.0)
-        
-        if tipe == 'PG':
-            jawaban_benar = request.form.get('jawaban_pg', '').strip().upper()
-        else:
-            jawaban_benar = request.form.get('jawaban_essay', '').strip()
-
         if not mapel_id or not nomor_soal or not jawaban_benar:
             flash('Semua field wajib diisi.', 'danger')
-            return render_template('kunci_jawaban/tambah.html', title='Tambah Kunci Jawaban',
-                                   mapel_list=mapel_list, opsi=OPSI_JAWABAN)
-
-        if tipe == 'PG' and jawaban_benar not in OPSI_JAWABAN:
-            flash('Jawaban benar PG harus salah satu dari A, B, C, D, E.', 'danger')
-            return render_template('kunci_jawaban/tambah.html', title='Tambah Kunci Jawaban',
-                                   mapel_list=mapel_list, opsi=OPSI_JAWABAN)
-
+            return render_template('kunci_jawaban/tambah.html', title='Tambah Kunci Jawaban', mapel_list=mapel_list)
+        if not bobot or bobot <= 0:
+            flash('Bobot skor harus lebih dari 0.', 'danger')
+            return render_template('kunci_jawaban/tambah.html', title='Tambah Kunci Jawaban', mapel_list=mapel_list)
         existing = KunciJawaban.query.filter_by(mapel_id=mapel_id, nomor_soal=nomor_soal).first()
         if existing:
             flash(f'Kunci jawaban untuk soal nomor {nomor_soal} sudah ada.', 'warning')
-            return render_template('kunci_jawaban/tambah.html', title='Tambah Kunci Jawaban',
-                                   mapel_list=mapel_list, opsi=OPSI_JAWABAN)
-
-        kunci = KunciJawaban(
-            mapel_id=mapel_id, 
-            nomor_soal=nomor_soal, 
-            tipe=tipe, 
-            jawaban_benar=jawaban_benar, 
-            bobot=bobot
-        )
+            return render_template('kunci_jawaban/tambah.html', title='Tambah Kunci Jawaban', mapel_list=mapel_list)
+        kunci = KunciJawaban(mapel_id=mapel_id, nomor_soal=nomor_soal, jawaban_benar=jawaban_benar, bobot=bobot)
         db.session.add(kunci)
         db.session.commit()
         flash(f'Kunci jawaban soal {nomor_soal} berhasil ditambahkan.', 'success')
         return redirect(url_for('kunci.index', mapel_id=mapel_id))
-
-    return render_template('kunci_jawaban/tambah.html', title='Tambah Kunci Jawaban',
-                           mapel_list=mapel_list, opsi=OPSI_JAWABAN)
+    return render_template('kunci_jawaban/tambah.html', title='Tambah Kunci Jawaban', mapel_list=mapel_list)
 
 
 @kunci_bp.route('/edit/<int:id>', methods=['GET', 'POST'])
@@ -86,35 +60,21 @@ def tambah():
 def edit(id):
     kunci      = KunciJawaban.query.get_or_404(id)
     mapel_list = MataPelajaran.query.order_by(MataPelajaran.nama).all()
-
     if request.method == 'POST':
-        tipe  = request.form.get('tipe', 'PG').strip().upper()
-        bobot = request.form.get('bobot', type=float, default=1.0)
-        
-        if tipe == 'PG':
-            jawaban_benar = request.form.get('jawaban_pg', '').strip().upper()
-        else:
-            jawaban_benar = request.form.get('jawaban_essay', '').strip()
-
+        jawaban_benar = request.form.get('jawaban_benar', '').strip()
+        bobot         = request.form.get('bobot', type=float, default=1.0)
         if not jawaban_benar:
-            flash('Jawaban benar tidak boleh kosong.', 'danger')
-            return render_template('kunci_jawaban/edit.html', title='Edit Kunci Jawaban',
-                                   kunci=kunci, mapel_list=mapel_list, opsi=OPSI_JAWABAN)
-
-        if tipe == 'PG' and jawaban_benar not in OPSI_JAWABAN:
-            flash('Jawaban benar PG harus salah satu dari A, B, C, D, E.', 'danger')
-            return render_template('kunci_jawaban/edit.html', title='Edit Kunci Jawaban',
-                                   kunci=kunci, mapel_list=mapel_list, opsi=OPSI_JAWABAN)
-
-        kunci.tipe = tipe
-        kunci.bobot = bobot
+            flash('Kunci jawaban tidak boleh kosong.', 'danger')
+            return render_template('kunci_jawaban/edit.html', title='Edit Kunci Jawaban', kunci=kunci, mapel_list=mapel_list)
+        if not bobot or bobot <= 0:
+            flash('Bobot skor harus lebih dari 0.', 'danger')
+            return render_template('kunci_jawaban/edit.html', title='Edit Kunci Jawaban', kunci=kunci, mapel_list=mapel_list)
         kunci.jawaban_benar = jawaban_benar
+        kunci.bobot = bobot
         db.session.commit()
         flash(f'Kunci jawaban soal {kunci.nomor_soal} berhasil diperbarui.', 'success')
         return redirect(url_for('kunci.index', mapel_id=kunci.mapel_id))
-
-    return render_template('kunci_jawaban/edit.html', title='Edit Kunci Jawaban',
-                           kunci=kunci, mapel_list=mapel_list, opsi=OPSI_JAWABAN)
+    return render_template('kunci_jawaban/edit.html', title='Edit Kunci Jawaban', kunci=kunci, mapel_list=mapel_list)
 
 
 @kunci_bp.route('/hapus/<int:id>', methods=['POST'])

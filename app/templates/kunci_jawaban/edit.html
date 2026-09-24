@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+﻿{% extends 'base.html' %}
 {% block title %}Edit Kunci Jawaban{% endblock %}
 {% block page_title %}Edit Kunci Jawaban{% endblock %}
 
@@ -49,28 +49,6 @@
           </div>
         </div>
         <div>
-          <label class="block text-sm font-semibold text-gray-700 mb-2">
-            Tipe Soal <span class="text-red-400">*</span>
-          </label>
-          <div class="flex gap-4">
-            <label class="flex-1 cursor-pointer">
-              <input type="radio" name="tipe" value="PG" class="peer sr-only" onchange="toggleTipeSoal()" {% if kunci.tipe == 'PG' %}checked{% endif %}/>
-              <div class="px-4 py-3 bg-white border border-gray-200 rounded-xl text-center text-sm font-medium text-gray-600 peer-checked:bg-orange-50 peer-checked:border-orange-400 peer-checked:text-orange-600 transition-all shadow-sm">
-                Pilihan Ganda
-              </div>
-            </label>
-            <label class="flex-1 cursor-pointer">
-              <input type="radio" name="tipe" value="ESSAY" class="peer sr-only" onchange="toggleTipeSoal()" {% if kunci.tipe == 'ESSAY' %}checked{% endif %}/>
-              <div class="px-4 py-3 bg-white border border-gray-200 rounded-xl text-center text-sm font-medium text-gray-600 peer-checked:bg-orange-50 peer-checked:border-orange-400 peer-checked:text-orange-600 transition-all shadow-sm">
-                Essay
-              </div>
-            </label>
-          </div>
-        </div>
-      </div>
-
-      <div class="grid grid-cols-2 gap-6">
-        <div>
           <label class="block text-sm font-semibold text-gray-700 mb-2" for="bobot">
             Bobot Skor <span class="text-red-400">*</span>
           </label>
@@ -83,41 +61,21 @@
               placeholder="Contoh: 1.0"/>
           </div>
         </div>
-
-        <div id="container-pg" class="{% if kunci.tipe == 'ESSAY' %}hidden{% endif %}">
-          <label class="block text-sm font-semibold text-gray-700 mb-2" for="jawaban_pg">
-            Jawaban Benar (PG) <span class="text-red-400">*</span>
-          </label>
-          <div class="relative group">
-            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-              <i class="ph ph-check-circle text-gray-400 text-lg group-focus-within:text-orange-500 transition-colors"></i>
-            </div>
-            <select id="jawaban_pg" name="jawaban_pg"
-              class="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition-all text-sm appearance-none cursor-pointer shadow-sm">
-              <option value="">— Pilih Kunci —</option>
-              {% for o in opsi %}
-              <option value="{{ o }}" {% if o == kunci.jawaban_benar and kunci.tipe == 'PG' %}selected{% endif %}>{{ o }}</option>
-              {% endfor %}
-            </select>
-            <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
-              <i class="ph ph-caret-down text-gray-400"></i>
-            </div>
-          </div>
-        </div>
       </div>
 
-      <div id="container-essay" class="{% if kunci.tipe == 'PG' %}hidden{% endif %}">
-        <label class="block text-sm font-semibold text-gray-700 mb-2" for="jawaban_essay">
-          Kunci / Rubrik Jawaban (Essay) <span class="text-red-400">*</span>
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-2" for="jawaban_benar">
+          Kunci / Rubrik Jawaban Essay <span class="text-red-400">*</span>
         </label>
         <div class="relative group">
           <div class="absolute top-3 left-0 pl-4 flex items-start pointer-events-none">
             <i class="ph ph-text-align-left text-gray-400 text-lg group-focus-within:text-orange-500 transition-colors"></i>
           </div>
-          <textarea id="jawaban_essay" name="jawaban_essay" rows="3"
+          <textarea id="jawaban_benar" name="jawaban_benar" rows="4" required
             class="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition-all text-sm placeholder-gray-400 shadow-sm"
-            placeholder="Masukkan kata kunci atau rubrik penilaian...">{% if kunci.tipe == 'ESSAY' %}{{ kunci.jawaban_benar }}{% endif %}</textarea>
+            placeholder="Masukkan kata kunci atau rubrik penilaian...">{{ kunci.jawaban_benar }}</textarea>
         </div>
+        <p class="text-xs text-gray-400 mt-1.5 ml-1">Kunci ini akan dibandingkan dengan jawaban tulisan tangan siswa menggunakan TF-IDF + Cosine Similarity.</p>
       </div>
 
       <!-- Actions -->
@@ -132,29 +90,4 @@
     </form>
   </div>
 </div>
-
-<script>
-function toggleTipeSoal() {
-  const tipe = document.querySelector('input[name="tipe"]:checked').value;
-  const containerPg = document.getElementById('container-pg');
-  const containerEssay = document.getElementById('container-essay');
-  const inputPg = document.getElementById('jawaban_pg');
-  const inputEssay = document.getElementById('jawaban_essay');
-
-  if (tipe === 'PG') {
-    containerPg.classList.remove('hidden');
-    containerEssay.classList.add('hidden');
-    inputPg.required = true;
-    inputEssay.required = false;
-  } else {
-    containerPg.classList.add('hidden');
-    containerEssay.classList.remove('hidden');
-    inputPg.required = false;
-    inputEssay.required = true;
-  }
-}
-
-// Initialize on load
-document.addEventListener('DOMContentLoaded', toggleTipeSoal);
-</script>
 {% endblock %}

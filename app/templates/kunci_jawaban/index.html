@@ -69,46 +69,49 @@
   </div>
 
   {% elif kunci_list %}
-  <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 p-6">
-    {% for k in kunci_list %}
-    <div class="relative bg-white border border-gray-100 rounded-2xl p-4 hover:border-amber-200 hover:shadow-md hover:shadow-amber-100/50 transition-all group text-center flex flex-col items-center gap-2">
-      <div class="flex justify-between items-center w-full px-1">
-        <span class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Soal {{ k.nomor_soal }}</span>
-        {% if k.tipe == 'PG' %}
-          <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-50 text-blue-600">PG</span>
-        {% else %}
-          <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-purple-50 text-purple-600">ESSAY</span>
-        {% endif %}
-      </div>
-      
-      {% if k.tipe == 'PG' %}
-      <div class="w-14 h-14 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-3xl font-display font-bold group-hover:scale-110 transition-transform">
-        {{ k.jawaban_benar }}
-      </div>
-      {% else %}
-      <div class="w-full h-14 rounded-xl bg-purple-50/50 text-gray-700 flex items-center justify-center p-2 border border-purple-100/50 group-hover:scale-105 transition-transform">
-        <span class="text-xs font-medium line-clamp-2 text-center" title="{{ k.jawaban_benar }}">{{ k.jawaban_benar }}</span>
-      </div>
-      {% endif %}
-      
-      <div class="flex items-center gap-1 text-xs text-gray-400 mt-1">
-        <i class="ph-fill ph-scales"></i> {{ k.bobot }}
-      </div>
-      
-      <!-- Action Buttons (show on hover) -->
-      <div class="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-        <a href="{{ url_for('kunci.edit', id=k.id) }}" class="w-7 h-7 inline-flex items-center justify-center rounded-lg bg-white shadow-sm border border-gray-100 text-gray-500 hover:text-amber-600 hover:bg-amber-50 transition-colors">
-          <i class="ph-bold ph-pencil-simple text-xs"></i>
-        </a>
-        <button type="button" class="w-7 h-7 inline-flex items-center justify-center rounded-lg bg-white shadow-sm border border-gray-100 text-gray-500 hover:text-red-600 hover:bg-red-50 transition-colors"
-          data-delete-url="{{ url_for('kunci.hapus', id=k.id) }}"
-          data-delete-name="kunci jawaban soal {{ k.nomor_soal }}"
-          onclick="handleDelete(this)">
-          <i class="ph-bold ph-trash text-xs"></i>
-        </button>
-      </div>
-    </div>
-    {% endfor %}
+  <div class="overflow-x-auto w-full">
+    <table class="w-full text-left border-collapse">
+      <thead>
+        <tr class="bg-gray-50/50 border-b border-gray-100 text-xs uppercase tracking-wider text-gray-500 font-bold">
+          <th class="p-4 px-6 w-32">Nomor Soal</th>
+          <th class="p-4 px-6">Jawaban Benar</th>
+          <th class="p-4 px-6 w-32">Bobot</th>
+          <th class="p-4 px-6 text-right w-32">Aksi</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-100">
+        {% for k in kunci_list %}
+        <tr class="hover:bg-gray-50/80 transition-colors group">
+          <td class="p-4 px-6">
+            <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 text-gray-700 font-bold text-sm">
+              {{ k.nomor_soal }}
+            </span>
+          </td>
+          <td class="p-4 px-6 text-sm text-gray-700 max-w-md truncate" title="{{ k.jawaban_benar }}">
+            {{ k.jawaban_benar }}
+          </td>
+          <td class="p-4 px-6">
+            <span class="text-xs font-bold text-amber-600 bg-amber-50 px-2.5 py-1 rounded-md border border-amber-100">
+              Bobot {{ k.bobot }}
+            </span>
+          </td>
+          <td class="p-4 px-6 text-right">
+            <div class="flex items-center justify-end gap-2">
+              <a href="{{ url_for('kunci.edit', id=k.id) }}" class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-gray-100 border border-gray-200 text-gray-600 hover:bg-amber-100 hover:text-amber-700 hover:border-amber-200 transition-colors" title="Edit">
+                <i class="ph-bold ph-pencil-simple"></i>
+              </a>
+              <button type="button" class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-gray-100 border border-gray-200 text-gray-600 hover:bg-red-100 hover:text-red-700 hover:border-red-200 transition-colors"
+                data-delete-url="{{ url_for('kunci.hapus', id=k.id) }}"
+                data-delete-name="kunci jawaban soal {{ k.nomor_soal }}"
+                onclick="window.showConfirmModal(this.getAttribute('data-delete-url'), 'Apakah Anda yakin ingin menghapus ' + this.getAttribute('data-delete-name') + '?')" title="Hapus">
+                <i class="ph-bold ph-trash"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
   </div>
 
   {% else %}

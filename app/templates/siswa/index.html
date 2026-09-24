@@ -48,48 +48,54 @@
   </div>
 
   {% if siswa_list.items %}
-  <div class="divide-y divide-gray-100">
-    {% for siswa in siswa_list.items %}
-    <div class="p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 hover:bg-gray-50/80 transition-colors group">
-      
-      <div class="flex items-center gap-5">
-        <!-- Avatar/Initial -->
-        <div class="w-12 h-12 rounded-full bg-indigo-50 text-indigo-500 flex items-center justify-center font-bold text-lg shrink-0 group-hover:scale-105 transition-transform">
-          {{ siswa.nama[0]|upper }}
-        </div>
-        
-        <!-- Info -->
-        <div>
-          <h4 class="font-bold text-gray-900 text-lg mb-1">{{ siswa.nama }}</h4>
-          <div class="flex flex-wrap items-center gap-3 text-sm text-gray-500">
-            <span class="flex items-center gap-1 font-medium bg-gray-100 px-2 py-0.5 rounded text-gray-700">
-              <i class="ph ph-identification-card text-gray-400"></i> {{ siswa.nis }}
-            </span>
-            <span class="flex items-center gap-1">
-              <i class="ph-fill ph-chalkboard-teacher text-indigo-400"></i> Kelas <strong class="text-gray-700">{{ siswa.kelas }}</strong>
-            </span>
-            <span class="flex items-center gap-1 text-gray-400">
-              <i class="ph ph-calendar-blank"></i> Terdaftar: {{ siswa.created_at.strftime('%d %b %Y') }}
-            </span>
-          </div>
-        </div>
-      </div>
-      
-      <!-- Actions -->
-      <div class="flex items-center gap-2 shrink-0 md:opacity-0 group-hover:opacity-100 transition-opacity">
-        <a href="{{ url_for('siswa.edit', id=siswa.id) }}" class="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-gray-100 text-gray-600 hover:bg-amber-100 hover:text-amber-700 transition-colors" title="Edit">
-          <i class="ph-bold ph-pencil-simple"></i>
-        </a>
-        <button type="button" class="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-gray-100 text-gray-600 hover:bg-red-100 hover:text-red-700 transition-colors"
-          data-delete-url="{{ url_for('siswa.hapus', id=siswa.id) }}"
-          data-delete-name="{{ siswa.nama }}"
-          onclick="handleDelete(this)" title="Hapus">
-          <i class="ph-bold ph-trash"></i>
-        </button>
-      </div>
-
-    </div>
-    {% endfor %}
+  <div class="overflow-x-auto w-full">
+    <table class="w-full text-left border-collapse">
+      <thead>
+        <tr class="bg-gray-50/50 border-b border-gray-100 text-xs uppercase tracking-wider text-gray-500 font-bold">
+          <th class="p-4 px-6">Nama Siswa</th>
+          <th class="p-4 px-6">NIS</th>
+          <th class="p-4 px-6">Kelas</th>
+          <th class="p-4 px-6">Tanggal Terdaftar</th>
+          <th class="p-4 px-6 text-right">Aksi</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-100">
+        {% for siswa in siswa_list.items %}
+        <tr class="hover:bg-gray-50/80 transition-colors group">
+          <td class="p-4 px-6">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-full bg-indigo-50 text-indigo-500 flex items-center justify-center font-bold text-sm shrink-0">
+                {{ siswa.nama[0]|upper }}
+              </div>
+              <span class="font-bold text-gray-900">{{ siswa.nama }}</span>
+            </div>
+          </td>
+          <td class="p-4 px-6 text-sm text-gray-600 font-medium">
+            <span class="bg-gray-100 px-2.5 py-1 rounded-md text-gray-700 font-mono text-xs">{{ siswa.nis }}</span>
+          </td>
+          <td class="p-4 px-6 text-sm text-gray-600 font-medium">
+            <span class="inline-flex items-center gap-1.5"><i class="ph-fill ph-chalkboard-teacher text-indigo-400"></i> {{ siswa.kelas }}</span>
+          </td>
+          <td class="p-4 px-6 text-sm text-gray-500">
+            {{ siswa.created_at.strftime('%d %b %Y') }}
+          </td>
+          <td class="p-4 px-6 text-right">
+            <div class="flex items-center justify-end gap-2">
+              <a href="{{ url_for('siswa.edit', id=siswa.id) }}" class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-gray-100 text-gray-600 hover:bg-amber-100 hover:text-amber-700 transition-colors" title="Edit">
+                <i class="ph-bold ph-pencil-simple"></i>
+              </a>
+              <button type="button" class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-gray-100 text-gray-600 hover:bg-red-100 hover:text-red-700 transition-colors"
+                data-delete-url="{{ url_for('siswa.hapus', id=siswa.id) }}"
+                data-delete-name="{{ siswa.nama }}"
+                onclick="window.showConfirmModal(this.getAttribute('data-delete-url'), 'Apakah Anda yakin ingin menghapus data siswa: ' + this.getAttribute('data-delete-name') + '?')" title="Hapus">
+                <i class="ph-bold ph-trash"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
   </div>
 
   <!-- Pagination -->

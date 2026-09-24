@@ -48,43 +48,55 @@
   </div>
 
   {% if mapel_list.items %}
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
-    {% for mapel in mapel_list.items %}
-    <div class="bg-white border border-gray-100 rounded-2xl p-5 hover:border-cyan-200 hover:shadow-lg hover:shadow-cyan-100/50 transition-all group flex flex-col justify-between">
-      
-      <div>
-        <div class="flex justify-between items-start mb-4">
-          <div class="w-12 h-12 rounded-xl bg-cyan-50 text-cyan-500 flex items-center justify-center text-2xl group-hover:scale-110 group-hover:-rotate-3 transition-transform">
-            <i class="ph-fill ph-book-bookmark"></i>
-          </div>
-          <span class="bg-gray-100 text-gray-600 px-2 py-1 rounded text-xs font-bold uppercase tracking-wider group-hover:bg-cyan-100 group-hover:text-cyan-700 transition-colors">
-            {{ mapel.kode }}
-          </span>
-        </div>
-        
-        <h4 class="font-bold text-gray-900 text-lg mb-2">{{ mapel.nama }}</h4>
-        <p class="text-sm text-gray-500 line-clamp-2 mb-6">
-          {{ mapel.deskripsi or 'Tidak ada deskripsi' }}
-        </p>
-      </div>
-      
-      <div class="flex items-center gap-2 pt-4 border-t border-gray-50">
-        <a href="{{ url_for('kunci.index', mapel_id=mapel.id) }}" class="flex-1 inline-flex items-center justify-center gap-2 py-2 rounded-lg bg-indigo-50 text-indigo-600 font-medium hover:bg-indigo-100 transition-colors text-sm" title="Kunci Jawaban">
-          <i class="ph-bold ph-key"></i> Kunci Jawaban
-        </a>
-        <a href="{{ url_for('mapel.edit', id=mapel.id) }}" class="w-10 h-10 inline-flex items-center justify-center rounded-lg bg-gray-50 text-gray-600 hover:bg-amber-100 hover:text-amber-700 transition-colors" title="Edit">
-          <i class="ph-bold ph-pencil-simple"></i>
-        </a>
-        <button type="button" class="w-10 h-10 inline-flex items-center justify-center rounded-lg bg-gray-50 text-gray-600 hover:bg-red-100 hover:text-red-700 transition-colors"
-          data-delete-url="{{ url_for('mapel.hapus', id=mapel.id) }}"
-          data-delete-name="{{ mapel.nama }}"
-          onclick="handleDelete(this)" title="Hapus">
-          <i class="ph-bold ph-trash"></i>
-        </button>
-      </div>
-
-    </div>
-    {% endfor %}
+  <div class="overflow-x-auto w-full">
+    <table class="w-full text-left border-collapse">
+      <thead>
+        <tr class="bg-gray-50/50 border-b border-gray-100 text-xs uppercase tracking-wider text-gray-500 font-bold">
+          <th class="p-4 px-6 w-32">Kode</th>
+          <th class="p-4 px-6">Mata Pelajaran</th>
+          <th class="p-4 px-6 hidden md:table-cell">Deskripsi</th>
+          <th class="p-4 px-6 text-right">Aksi</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-100">
+        {% for mapel in mapel_list.items %}
+        <tr class="hover:bg-gray-50/80 transition-colors group">
+          <td class="p-4 px-6">
+            <span class="bg-cyan-50 text-cyan-600 px-2.5 py-1 rounded-md font-mono text-xs font-bold uppercase tracking-wider border border-cyan-100">
+              {{ mapel.kode }}
+            </span>
+          </td>
+          <td class="p-4 px-6">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-gray-50 border border-gray-100 text-cyan-500 flex items-center justify-center text-lg shrink-0 group-hover:bg-cyan-50 transition-colors">
+                <i class="ph-fill ph-book-bookmark"></i>
+              </div>
+              <span class="font-bold text-gray-900">{{ mapel.nama }}</span>
+            </div>
+          </td>
+          <td class="p-4 px-6 hidden md:table-cell text-sm text-gray-500 max-w-[200px] truncate" title="{{ mapel.deskripsi }}">
+            {{ mapel.deskripsi or '-' }}
+          </td>
+          <td class="p-4 px-6 text-right">
+            <div class="flex items-center justify-end gap-2">
+              <a href="{{ url_for('kunci.index', mapel_id=mapel.id) }}" class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-50 border border-indigo-100 text-indigo-600 hover:bg-indigo-100 transition-colors text-xs font-bold" title="Kunci Jawaban">
+                <i class="ph-bold ph-key"></i> Kunci
+              </a>
+              <a href="{{ url_for('mapel.edit', id=mapel.id) }}" class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-gray-100 border border-gray-200 text-gray-600 hover:bg-amber-100 hover:text-amber-700 hover:border-amber-200 transition-colors" title="Edit">
+                <i class="ph-bold ph-pencil-simple"></i>
+              </a>
+              <button type="button" class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-gray-100 border border-gray-200 text-gray-600 hover:bg-red-100 hover:text-red-700 hover:border-red-200 transition-colors"
+                data-delete-url="{{ url_for('mapel.hapus', id=mapel.id) }}"
+                data-delete-name="{{ mapel.nama }}"
+                onclick="window.showConfirmModal(this.getAttribute('data-delete-url'), 'Apakah Anda yakin ingin menghapus mata pelajaran: ' + this.getAttribute('data-delete-name') + '?')" title="Hapus">
+                <i class="ph-bold ph-trash"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
   </div>
 
   <!-- Pagination -->
